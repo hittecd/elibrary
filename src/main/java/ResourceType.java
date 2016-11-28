@@ -5,5 +5,6 @@ public enum ResourceType {
     SHEEP,
     ORE,
     WHEAT,
-    BRICK
+    BRICK,
+    DESERT
 }
