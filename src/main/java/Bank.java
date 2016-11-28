@@ -1,6 +1,14 @@
 import java.util.*;
 
+
 public class Bank {
+
+    private static final int KNIGHT_CARD_COUNT = 14;
+    private static final int ROAD_BUILDER_COUNT = 2;
+    private static final int MONOPOLY_COUNT = 2;
+    private static final int YEAR_OF_PLENTY_COUNT = 2;
+    private static final int VICTORY_POINT_COUNT = 5;
+    private static final int TOTAL_RESOURCE_COUNT = 19;
 
     private class DevelopmentCardQueue {
 
@@ -83,34 +91,34 @@ public class Bank {
     }
 
     private void initResourceTable() {
-        //initialize 19 of each Resource Type
-        resourceMap.put(ResourceType.LUMBER, 19);
-        resourceMap.put(ResourceType.WHEAT, 19);
-        resourceMap.put(ResourceType.SHEEP, 19);
-        resourceMap.put(ResourceType.BRICK, 19);
-        resourceMap.put(ResourceType.ORE, 19);
+        // initialize 19 of each Resource Type
+        resourceMap.put(ResourceType.LUMBER, TOTAL_RESOURCE_COUNT);
+        resourceMap.put(ResourceType.WHEAT, TOTAL_RESOURCE_COUNT);
+        resourceMap.put(ResourceType.SHEEP, TOTAL_RESOURCE_COUNT);
+        resourceMap.put(ResourceType.BRICK, TOTAL_RESOURCE_COUNT);
+        resourceMap.put(ResourceType.ORE, TOTAL_RESOURCE_COUNT);
     }
 
     private void initDevelopmentCardQueue() {
         List<DevelopmentCard> devCards = new ArrayList();
 
-        //add 14 'KNIGHT' cards
-        for(int i=1; i<=14; i++)
+        // add 14 'KNIGHT' cards
+        for(int i=1; i<=KNIGHT_CARD_COUNT; i++)
             devCards.add(DevelopmentCard.KNIGHT);
 
-        //add 5 'VICTORY POINT' cards
-        for(int i=1; i<=5; i++)
+        // add 5 'VICTORY POINT' cards
+        for(int i=1; i<=VICTORY_POINT_COUNT; i++)
             devCards.add(DevelopmentCard.VICTORY_POINT);
 
-        //add 2 'MONOPOLY' cards
+        // add 2 'MONOPOLY' cards
         devCards.add(DevelopmentCard.MONOPOLY);
         devCards.add(DevelopmentCard.MONOPOLY);
 
-        //add 2 'YEAR OF PLENTY' cards
+        // add 2 'YEAR OF PLENTY' cards
         devCards.add(DevelopmentCard.YEAR_OF_PLENTY);
         devCards.add(DevelopmentCard.YEAR_OF_PLENTY);
 
-        //add 2 'ROAD BUILDER' cards
+        // add 2 'ROAD BUILDER' cards
         devCards.add(DevelopmentCard.ROAD_BUILDER);
         devCards.add(DevelopmentCard.ROAD_BUILDER);
 
@@ -124,31 +132,31 @@ public class Bank {
         int allocatedCount;
         int newCount;
 
-        //allocate 'SHEEP' cards
+        // allocate 'SHEEP' cards
         currentCount = resourceMap.get(ResourceType.SHEEP);
         allocatedCount = allocatedCards.get(ResourceType.SHEEP);
         newCount = currentCount - allocatedCount;
         resourceMap.put(ResourceType.SHEEP, (newCount >= 0 ? newCount : 0));
 
-        //allocate 'WHEAT' cards
+        // allocate 'WHEAT' cards
         currentCount = resourceMap.get(ResourceType.WHEAT);
         allocatedCount = allocatedCards.get(ResourceType.WHEAT);
         newCount = currentCount - allocatedCount;
         resourceMap.put(ResourceType.WHEAT, (newCount >= 0 ? newCount : 0));
 
-        //allocate 'LUMBER' cards
+        // allocate 'LUMBER' cards
         currentCount = resourceMap.get(ResourceType.LUMBER);
         allocatedCount = allocatedCards.get(ResourceType.LUMBER);
         newCount = currentCount - allocatedCount;
         resourceMap.put(ResourceType.LUMBER, (newCount >= 0 ? newCount : 0));
 
-        //allocate 'ORE' cards
+        // allocate 'ORE' cards
         currentCount = resourceMap.get(ResourceType.ORE);
         allocatedCount = allocatedCards.get(ResourceType.ORE);
         newCount = currentCount - allocatedCount;
         resourceMap.put(ResourceType.ORE, (newCount >= 0 ? newCount : 0));
 
-        //allocate 'BRICK' cards
+        // allocate 'BRICK' cards
         currentCount = resourceMap.get(ResourceType.BRICK);
         allocatedCount = allocatedCards.get(ResourceType.BRICK);
         newCount = currentCount - allocatedCount;
@@ -159,27 +167,27 @@ public class Bank {
         int currentCount;
         int newCount;
 
-        //add 'SHEEP' cards
+        // add 'SHEEP' cards
         currentCount = resourceMap.get(ResourceType.SHEEP);
         newCount = newCards.get(ResourceType.SHEEP);
         resourceMap.put(ResourceType.SHEEP, currentCount + newCount);
 
-        //add 'WHEAT' cards
+        // add 'WHEAT' cards
         currentCount = resourceMap.get(ResourceType.WHEAT);
         newCount = newCards.get(ResourceType.WHEAT);
         resourceMap.put(ResourceType.WHEAT, currentCount + newCount);
 
-        //add 'LUMBER' cards
+        // add 'LUMBER' cards
         currentCount = resourceMap.get(ResourceType.LUMBER);
         newCount = newCards.get(ResourceType.LUMBER);
         resourceMap.put(ResourceType.LUMBER, currentCount + newCount);
 
-        //add 'ORE' cards
+        // add 'ORE' cards
         currentCount = resourceMap.get(ResourceType.ORE);
         newCount = newCards.get(ResourceType.ORE);
         resourceMap.put(ResourceType.ORE, currentCount + newCount);
 
-        //add 'BRICK' cards
+        // add 'BRICK' cards
         currentCount = resourceMap.get(ResourceType.BRICK);
         newCount = newCards.get(ResourceType.BRICK);
         resourceMap.put(ResourceType.BRICK, currentCount + newCount);
