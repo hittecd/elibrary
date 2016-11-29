@@ -1750,22 +1750,22 @@ public class Board {
 
         // add 'WHEAT' resources
         for(int i=0; i<WHEAT_HEX_COUNT; i++) {
-            resources.add(ResourceType.LUMBER);
+            resources.add(ResourceType.WHEAT);
         }
 
         // add 'SHEEP' resources
         for(int i=0; i<SHEEP_HEX_COUNT; i++) {
-            resources.add(ResourceType.LUMBER);
+            resources.add(ResourceType.SHEEP);
         }
 
         // add 'BRICK' resources
         for(int i=0; i<BRICK_HEX_COUNT; i++) {
-            resources.add(ResourceType.LUMBER);
+            resources.add(ResourceType.BRICK);
         }
 
         // add 'ORE' resources
         for(int i=0; i<ORE_HEX_COUNT; i++) {
-            resources.add(ResourceType.LUMBER);
+            resources.add(ResourceType.ORE);
         }
 
         // add 'DESERT' resource
