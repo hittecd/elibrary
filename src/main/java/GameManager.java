@@ -18,7 +18,10 @@ public class GameManager {
         // init main menu ui
         MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
             public void actionPerformed(ActionEvent e) {
-                newGame(3);
+                if(e.getSource() == mainMenuUI.newGameBtn3)
+                    newGame(3);
+                else
+                    newGame(4);
             }
         };
         mainMenuUI = new MainMenuUI(listener); // automatically sets up ui
@@ -27,7 +30,6 @@ public class GameManager {
 
         mainGameFrameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainGameFrameUI.setExtendedState(JFrame.MAXIMIZED_BOTH); // set ui to full screen
-        mainGameFrameUI.setUndecorated(true);
         mainGameFrameUI.setVisible(true);
     }
 
@@ -36,11 +38,16 @@ public class GameManager {
 
         currentGame = new Game(numPlayers);
 
-        /**
-         * TODO: replace mainMenuUI with gameUI
-         * mainGameFrameUI.remove(mainMenuUI);
-         * mainGameFrameUI.add(currentGame.getGameUI());
-         */
+        mainGameFrameUI.remove(mainMenuUI);
+
+
+        mainGameFrameUI.setContentPane(currentGame.getGameUI());
+        mainGameFrameUI.pack();
+        mainGameFrameUI.setLocationRelativeTo(null);
+
+        //mainGameFrameUI.add(currentGame.getGameUI());
+        mainGameFrameUI.revalidate();
+        mainGameFrameUI.repaint();
     }
 
     /**

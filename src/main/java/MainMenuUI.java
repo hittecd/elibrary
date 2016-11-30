@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 
 public class MainMenuUI extends JPanel {
@@ -9,8 +13,13 @@ public class MainMenuUI extends JPanel {
 
     private MainMenuUIListener mainMenuUIListener;
 
-    private JLabel newGameLabel = new JLabel("New Game:");
+    private JPanel logoPanel = new JPanel();
+
+    private JPanel controlPanel = new JPanel();
+
+    private JLabel newGameLabel = new JLabel("New Game");
     public JButton newGameBtn3 = new JButton("3 Players");
+    public JButton newGameBtn4 = new JButton("4 Players");
 
     /**
      * TODO: implement load features
@@ -32,12 +41,38 @@ public class MainMenuUI extends JPanel {
     public MainMenuUI(MainMenuUIListener listener) {
         setMainMenuUIListener(listener);
 
+        Border blackline = BorderFactory.createLineBorder(Color.BLACK);
+
+        //format logo panel
+        try {
+            BufferedImage myPicture = ImageIO.read(this.getClass().getResource("images/settlers-of-catan-main.jpg"));
+            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+            logoPanel.add(picLabel);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        logoPanel.setBorder(blackline);
+
+        //format control panel
+        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
+
         newGameBtn3.addActionListener(mainMenuUIListener);
+        newGameBtn4.addActionListener(mainMenuUIListener);
 
-        this.add(newGameLabel);
-        this.add(newGameBtn3);
+        controlPanel.add(newGameLabel);
+        controlPanel.add(newGameBtn3);
+        controlPanel.add(newGameBtn4);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER));
+        controlPanel.setBorder(blackline);
+        controlPanel.setPreferredSize(new Dimension(300, 300));
+
+        //format main ui
+        this.add(logoPanel);
+        this.add(controlPanel);
+        this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        this.setBorder(blackline);
     }
 
     public void setMainMenuUIListener(MainMenuUIListener mainMenuUIListener) {
