@@ -9,7 +9,7 @@ public class Hexagon extends Polygon {
     private Point[] points = new Point[SIDES];
     private Point center = new Point(0, 0);
     private int radius;
-    private int rotation = 90;
+    private int rotation = 0;
 
     public Hexagon(Point center, int radius) {
         npoints = SIDES;
@@ -79,14 +79,20 @@ public class Hexagon extends Polygon {
 
     public void draw(Graphics2D g, int x, int y, int lineThickness, int colorValue, boolean filled) {
         // Store before changing.
+
         Stroke tmpS = g.getStroke();
         Color tmpC = g.getColor();
 
         g.setColor(new Color(colorValue));
         g.setStroke(new BasicStroke(lineThickness, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
 
-        if (filled)
+        if (filled) {
             g.fillPolygon(xpoints, ypoints, npoints);
+            System.out.println("Center(x,y): (" + center.x + "," + center.y + ")");
+            for (int i = 0; i < 6; i++) {
+                System.out.println("(x,y): (" + xpoints[i] + "," + ypoints[i] + ")");
+            }
+        }
         else
             g.drawPolygon(xpoints, ypoints, npoints);
 
