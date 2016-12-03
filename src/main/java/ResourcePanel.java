@@ -1,23 +1,22 @@
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.*;
 
+public class ResourcePanel extends JPanel{
 
-public class ResourcePanel {
+    private final int WIDTH = 790;
+    private final int HEIGHT = 190;
 
-    public interface ResourcePanelListener {};
+    public interface ResourcePanelInterface {};
 
-    private ResourcePanelListener resourcePanelListener;
-
-    public void setResourcePanelListener(ResourcePanelListener listener) {
-        this.resourcePanelListener= listener;
+    public ResourcePanel() {
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
     }
-
-    private GameState currentState;
-
-    public ResourcePanel(Game game) {
-        game.registerUpdateStateListener(new Game.UpdateStateListener() {
-            public void updateState(GameState newState) {
-
-            }
-        });
-    }
-
 }

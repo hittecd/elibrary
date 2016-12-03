@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 
@@ -14,7 +15,6 @@ public class GameManager {
 
         // init main game frame
         mainGameFrameUI = new JFrame("Welcome to Settlers of Cataan!");
-
         // init main menu ui
         MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
             public void actionPerformed(ActionEvent e) {
