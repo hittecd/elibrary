@@ -34,6 +34,14 @@ public class Board {
         assignValuesToHexes();
     }
 
+    public void buildRoad() {}
+
+    public void buildSettlement() {}
+
+    public void buildCity() {}
+
+    public void placeRobber() {}
+
     private void initEdges() {
         for(int i=0; i<EDGE_COUNT; i++) {
             edgeIndex.add(i, new Edge(i));

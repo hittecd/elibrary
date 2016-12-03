@@ -1,6 +1,18 @@
 
 
 public enum GameState {
+    SETUP_BOARD_1,
+    SETUP_BOARD_2,
+    SETUP_BOARD_3,
+    SETUP_BOARD_4,
+    SETUP_BOARD_5,
+    SETUP_BOARD_6,
+    SETUP_BOARD_7,
+    SETUP_BOARD_8,
+    SETUP_BOARD_9,
+    SETUP_BOARD_10,
+    SETUP_BOARD_11,
+    SETUP_BOARD_12,
     START_TURN,
     TURN_STARTED,
     BUILD_CITY,
