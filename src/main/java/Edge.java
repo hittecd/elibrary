@@ -16,7 +16,7 @@ public class Edge {
         this.id = id;
     }
 
-    public int getPlayerId(int playerId) {
+    public int getPlayerId() {
         return playerId;
     }
 

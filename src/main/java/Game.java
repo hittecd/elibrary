@@ -1,3 +1,4 @@
+import javax.naming.ldap.Control;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Game {
     }
 
     public void updateState(GameState newState) {
-        currentState = newState;
+        gameState = newState;
 
         for(UpdateStateListener listener : updateStateListenersList)
             listener.updateState(newState);
@@ -38,110 +39,89 @@ public class Game {
     private final Board board = new Board();
     private final PlayerManager playerManager;
     private final GameUI gameUI;
+    private final GameUI.ControlPanelListener controlPanelListener = new GameUI.ControlPanelListener() {
+        public void onBuyRoad() {}
 
-    private GameState currentState;
+        public void onBuySettlement() {}
+
+        public void onBuyCity() {}
+
+        public void onBuyDevCard() {}
+
+        public void onPlayDevCard() {}
+
+        public void onTradePlayers() {}
+
+        public void onTradeBank() {}
+
+        public void onStartTurn() {}
+
+        public void onEndTurn() {}
+
+        public void onExitGame() {}
+    };
+    private final GameUI.BoardPanelListener boardPanelListener = new GameUI.BoardPanelListener() {
+        public void onCornerClick(int cornerId) {
+            System.out.println("CORNER DETECTED IN GAME: " + cornerId);
+
+            if(gameState == GameState.BUILD_SETTLEMENT) {
+                board.buildSettlement(cornerId);
+            }
+            else if(gameState == GameState.BUILD_CITY) {
+                board.buildCity(cornerId);
+            }
+        }
+
+        public void onEdgeClick(int edgeId) {
+            System.out.println("EDGE DETECTED IN GAME: " + edgeId);
+
+            Player currentPlayer = playerManager.getCurrentPlayer();
+
+            if(gameState == GameState.SETUP_BOARD) {
+
+            }
+            else if(gameState == GameState.BUILD_ROAD) {
+                board.buildRoad(currentPlayer, edgeId);
+            }
+        }
+
+        public void onHexClick(int hexId) {
+            System.out.println("HEX DETECTED IN GAME: " + hexId);
+
+            board.placeRobber(hexId);
+        }
+    };
+
+    private GameState gameState;
 
     public Game(int numPlayers) {
         this.numPlayers = numPlayers;
 
         playerManager = new PlayerManager(numPlayers);
-        gameUI = new GameUI(this);
 
-        gameUI.setBoardPanelListener(new BoardPanel.BoardPanelListener() {
-            public void onEdgeClick() {
-                switch (currentState) {
-                    case BUILD_ROAD:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_2:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_4:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_6:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_8:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_10:
-                        board.buildRoad();
-                        break;
-                    case SETUP_BOARD_12:
-                        board.buildRoad();
-                        break;
-                    default:
-                        System.out.println("Cannot build road at this time - currentState = " + currentState);
-                }
-            }
+        List<Hex> hexList = board.getHexList();
+        List<Edge> edgeList = board.getEdgeList();
+        List<Corner> cornerList = board.getCornerList();
 
-            public void onCornerClick() {
-                switch (currentState) {
-                    case BUILD_SETTLEMENT:
-                        board.buildSettlement();
-                        break;
-                    case BUILD_CITY:
-                        board.buildCity();
-                        break;
-                    case SETUP_BOARD_1:
-                        board.buildSettlement();
-                        break;
-                    case SETUP_BOARD_3:
-                        board.buildSettlement();
-                        break;
-                    case SETUP_BOARD_5:
-                        board.buildSettlement();
-                        break;
-                    case SETUP_BOARD_7:
-                        board.buildSettlement();
-                        break;
-                    case SETUP_BOARD_9:
-                        board.buildSettlement();
-                        break;
-                    case SETUP_BOARD_11:
-                        board.buildSettlement();
-                        break;
-                    default:
-                        System.out.println("Cannot build road at this time - currentState = " + currentState);
-                }
-            }
+        gameUI = new GameUI(this, hexList, edgeList, cornerList);
+        gameUI.setBoardPanelListener(boardPanelListener);
+        gameUI.setControlPanelListener(controlPanelListener);
 
-            public void onHexClick() {
-                if(currentState == GameState.PLACE_ROBBER)
-                    board.placeRobber();
-            }
-        });
-
-        gameUI.setControlPanelListener(new ControlPanel.ControlPanelListener() {
-            public void onBuyRoad() {}
-
-            public void onBuySettlement() {}
-
-            public void onBuyCity() {}
-
-            public void onBuyDevCard() {}
-
-            public void onPlayDevCard() {}
-
-            public void onTradePlayers() {}
-
-            public void onTradeBank() {}
-
-            public void onStartTurn() {}
-
-            public void onEndTurn() {}
-
-            public void onExitGame() {}
-        });
-
-        // gameUI.setResourcePanel(new ResourcePanel.ResourcePanelListener() {});
-
-        updateState(GameState.SETUP_BOARD_1);
+        updateState(GameState.SETUP_BOARD);
     }
 
     public GameUI getGameUI() {
         return gameUI;
+    }
+
+    private class SetupBoardManager {
+
+        int turn = 0;
+
+        private SetupBoardManager() {
+
+        }
+
     }
 
 }

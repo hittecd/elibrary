@@ -34,13 +34,32 @@ public class Board {
         assignValuesToHexes();
     }
 
-    public void buildRoad() {}
+    public void buildRoad(Player player, int edgeId) {
+        Edge e = edgeIndex.get(edgeId);
 
-    public void buildSettlement() {}
+        if(e != null)
+            e.buildRoad(player.getPlayerId());
 
-    public void buildCity() {}
+        player.addEdge(e);
+    }
 
-    public void placeRobber() {}
+    public void buildSettlement(int cornerId) {}
+
+    public void buildCity(int cornerId) {}
+
+    public void placeRobber(int hexId) {}
+
+    public List<Hex> getHexList() {
+        return hexIndex;
+    }
+
+    public List<Edge> getEdgeList() {
+        return edgeIndex;
+    }
+
+    public List<Corner> getCornerList() {
+        return cornerIndex;
+    }
 
     private void initEdges() {
         for(int i=0; i<EDGE_COUNT; i++) {

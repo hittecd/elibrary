@@ -11,8 +11,8 @@ public class Player {
     private final List<Edge> edgesList = new ArrayList();
     private final List<Corner> cornersList = new ArrayList();
 
-    int playerId;
-    int victoryPoints = 0;
+    private int playerId;
+    private int victoryPoints = 0;
 
     public Player(int playerId) {
         this.playerId = playerId;
@@ -61,5 +61,7 @@ public class Player {
 
     }
 
-
+    public void addEdge(Edge e) {
+        edgesList.add(e);
+    }
 }
