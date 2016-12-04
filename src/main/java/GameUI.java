@@ -75,8 +75,8 @@ public class GameUI extends JPanel {
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
-        private final int WIDTH = 1000;
-        private final int HEIGHT = 800;
+        private final int WIDTH = 990;
+        private final int HEIGHT = 790;
 
         private final Map<ResourceType, Color> resourceTypeColorMap = new HashMap<ResourceType, Color>();
         private final Map<Integer, Color> playerColorMap = new HashMap<Integer, Color>();
@@ -308,14 +308,13 @@ public class GameUI extends JPanel {
                 String text = String.format("%s", val);
                 if(val == 0){
                     text = "R";
+                    g2d.setColor(new Color(0x008080));
+                    g2d.fillOval(XCenters[i]+origin.x - 15, YCenters[i]+origin.y - 15, 30, 30);
+                    g2d.setColor(defaultColor);
                 }
                 int w = metrics.stringWidth(text);
                 int h = metrics.getHeight();
                 g2d.drawString(text, XCenters[i]+origin.x-w/2, YCenters[i]+origin.y+h/2);
-            }
-
-            for(int i = 0; i < 19; i++){
-
             }
 
             Color color;
@@ -351,6 +350,21 @@ public class GameUI extends JPanel {
 
                 g2d.setColor(color);
                 g2d.fill(Corner2D[i]);
+            }
+
+            //g2d.setColor(new Color(0x4488FF));
+            //g2d.fillRect(0,0, 100, 120);
+            defaultColor = new Color(0x000000);
+            int i = 0;
+            for (ResourceType ColorKey: resourceTypeColorMap.keySet()){
+                g2d.setColor(resourceTypeColorMap.get(ColorKey));
+                g2d.fillRect(5, (20*i) + 5, 10, 10);
+                g2d.setColor(defaultColor);
+                String text = ColorKey.name().toLowerCase();
+                int w = metrics.stringWidth(text);
+                int h = metrics.getHeight();
+                g2d.drawString(text,20,(20*i) + 5 + h/2);
+                i += 1;
             }
 
         }
@@ -456,9 +470,6 @@ public class GameUI extends JPanel {
 
     private class ControlPanel extends JPanel {
 
-        private final int WIDTH = 190;
-        private final int HEIGHT = 390;
-
         private final JLabel controlPanelLabel = new JLabel("Control Panel");
 
         private final JLabel gameStateLablel = new JLabel("Game State: ");
@@ -490,7 +501,6 @@ public class GameUI extends JPanel {
         };
 
         public ControlPanel() {
-            setPreferredSize(new Dimension(WIDTH, HEIGHT));
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -538,8 +548,6 @@ public class GameUI extends JPanel {
     }
 
     private class ResourcePanel extends JPanel {
-        private final int WIDTH = 190;
-        private final int HEIGHT = 600;
 
         private final JLabel resourceBoxLabel = new JLabel("Resource Panel");
         private final JLabel wheatCountLabel = new JLabel();
@@ -562,7 +570,6 @@ public class GameUI extends JPanel {
 
         public ResourcePanel() {
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-            setPreferredSize(new Dimension(WIDTH, HEIGHT));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             this.add(resourceBoxLabel);
