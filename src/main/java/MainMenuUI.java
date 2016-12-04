@@ -2,6 +2,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,17 +10,11 @@ import java.io.IOException;
 
 public class MainMenuUI extends JPanel {
 
-    public interface MainMenuUIListener extends ActionListener {};
-
-    private MainMenuUIListener mainMenuUIListener;
-
-    private JPanel logoPanel = new JPanel();
-
-    private JPanel controlPanel = new JPanel();
-
-    private JLabel newGameLabel = new JLabel("New Game");
-    public JButton newGameBtn3 = new JButton("3 Players");
-    public JButton newGameBtn4 = new JButton("4 Players");
+    private final JPanel logoPanel = new JPanel();
+    private final JPanel controlPanel = new JPanel();
+    private final JLabel newGameLabel = new JLabel("New Game");
+    private final JButton newGameBtn3 = new JButton("3 Players");
+    private final JButton newGameBtn4 = new JButton("4 Players");
 
     /**
      * TODO: implement load features
@@ -37,6 +32,17 @@ public class MainMenuUI extends JPanel {
      * TODO: impelment quit game features
      * private JButton quitGameBtn;
      */
+
+    private final ActionListener mainMenuUIActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == newGameBtn3)
+                mainMenuUIListener.startNewGame(3);
+            else if(e.getSource() == newGameBtn4)
+                mainMenuUIListener.startNewGame(4);
+        }
+    };
+
+    private MainMenuUIListener mainMenuUIListener;
 
     public MainMenuUI(MainMenuUIListener listener) {
         setMainMenuUIListener(listener);
@@ -58,8 +64,8 @@ public class MainMenuUI extends JPanel {
         //format control panel
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
 
-        newGameBtn3.addActionListener(mainMenuUIListener);
-        newGameBtn4.addActionListener(mainMenuUIListener);
+        newGameBtn3.addActionListener(mainMenuUIActionListener);
+        newGameBtn4.addActionListener(mainMenuUIActionListener);
 
         controlPanel.add(newGameLabel);
         controlPanel.add(newGameBtn3);
@@ -77,6 +83,10 @@ public class MainMenuUI extends JPanel {
 
     public void setMainMenuUIListener(MainMenuUIListener mainMenuUIListener) {
         this.mainMenuUIListener = mainMenuUIListener;
+    }
+
+    public interface MainMenuUIListener {
+        void startNewGame(int numPlayers);
     }
 
 }

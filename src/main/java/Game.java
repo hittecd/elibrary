@@ -151,7 +151,7 @@ public class Game {
         List<Edge> edgeList = board.getEdgeList();
         List<Corner> cornerList = board.getCornerList();
 
-        gameUI = new GameUI(this, hexList, edgeList, cornerList);
+        gameUI = new GameUI(this);
         gameUI.setBoardPanelListener(boardPanelListener);
         gameUI.setControlPanelListener(controlPanelListener);
         gameUI.setResourcePanelListener(resourcePanelLister);

@@ -15,13 +15,11 @@ public class GameManager {
 
         // init main game frame
         mainGameFrameUI = new JFrame("Welcome to Settlers of Cataan!");
+
         // init main menu ui
         MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == mainMenuUI.newGameBtn3)
-                    newGame(3);
-                else
-                    newGame(4);
+            public void startNewGame(int numPlayers) {
+                newGame(numPlayers);
             }
         };
         mainMenuUI = new MainMenuUI(listener); // automatically sets up ui
@@ -44,8 +42,6 @@ public class GameManager {
         mainGameFrameUI.setContentPane(currentGame.getGameUI());
         mainGameFrameUI.pack();
         mainGameFrameUI.setLocationRelativeTo(null);
-
-        //mainGameFrameUI.add(currentGame.getGameUI());
         mainGameFrameUI.revalidate();
         mainGameFrameUI.repaint();
     }
