@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.res.XPATHErrorResources;
 import javafx.scene.control.Control;
 import javafx.scene.shape.Circle;
 
@@ -52,10 +53,10 @@ public class GameUI extends JPanel {
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
         leftPane.add(boardPane);
-        leftPane.add(resourcePane);
 
         rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
         rightPane.add(controlPanel);
+        rightPane.add(resourcePane);
 
         this.add(leftPane);
         this.add(rightPane);
@@ -74,8 +75,8 @@ public class GameUI extends JPanel {
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
-        private final int WIDTH = 800;
-        private final int HEIGHT = 600;
+        private final int WIDTH = 1000;
+        private final int HEIGHT = 800;
 
         private final Map<ResourceType, Color> resourceTypeColorMap = new HashMap<ResourceType, Color>();
         private final Map<Integer, Color> playerColorMap = new HashMap<Integer, Color>();
@@ -85,7 +86,7 @@ public class GameUI extends JPanel {
         private List<Corner> cornerList = null;
 
         // This array holds all 54 X values for the corners.
-        private final int[] XPoints = { -25, 25,
+        private final int[] unscaledXPoints = { -25, 25,
                 -100, -50, 50, 100,
                 -175, -125, -25, 25, 125, 175,
                 -200, -100, -50, 50, 100, 200,
@@ -98,7 +99,7 @@ public class GameUI extends JPanel {
                 -25, 25};
 
         // This array holds all 54 Y values for the corners.
-        private final int[] YPoints = { -220, -220,
+        private final int[] unscaledYPoints = { -220, -220,
                 -176, -176, -176, -176,
                 -132, -132, -132, -132, -132, -132,
                 -88, -88, -88, -88, -88, -88,
@@ -109,6 +110,26 @@ public class GameUI extends JPanel {
                 132, 132, 132, 132, 132, 132,
                 176, 176, 176, 176,
                 220, 220};
+
+        private final int[]unscaledXCenters = { 0,
+                -75, 75,
+                -150, 0, 150,
+                -75, 75,
+                -150, 0, 150,
+                -75, 75,
+                -150, 0, 150,
+                -75, 75,
+                0};
+        private final int[]unscaledYCenters = { -176,
+                -132, -132,
+                -88, -88, -88,
+                -44, -44,
+                0, 0, 0,
+                44, 44,
+                88, 88, 88,
+                132, 132,
+                176};
+
 
         public Polygon[] Hexes2D = new Polygon[19];
         public Ellipse2D.Double[] Corner2D = new Ellipse2D.Double[54];
@@ -146,6 +167,11 @@ public class GameUI extends JPanel {
                 {2,49,52}, {1,53,50},
                 {0,52,53}};
 
+        private int[] XPoints;
+        private int[] YPoints;
+        private int[] XCenters;
+        private int[] YCenters;
+
         private Font font = new Font("Arial", Font.BOLD, 18);
         FontMetrics metrics;
 
@@ -159,6 +185,19 @@ public class GameUI extends JPanel {
             }
         };
 
+        private int[] Scale(int[] XY, double newRadius){
+            double[] scaler = new double[XY.length];
+            for(int i = 0; i < XY.length; i++){
+                scaler[i] = XY[i];
+            }
+            double scaleFactor = newRadius/50;
+            int[] scaledXY = new int[XY.length];
+            for(int i = 0; i < scaler.length; i++){
+                scaledXY[i] = (int)(scaler[i] * scaleFactor);
+            }
+            return scaledXY;
+        }
+
         public BoardPanel() {
             addMouseListener(this);
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -166,6 +205,10 @@ public class GameUI extends JPanel {
 
             initColorMap();
             initPlayerColorMap();
+            XPoints = Scale(unscaledXPoints, 85);
+            YPoints = Scale(unscaledYPoints, 85);
+            XCenters = Scale(unscaledXCenters, 85);
+            YCenters = Scale(unscaledYCenters, 85);
         }
 
         private void initColorMap() {
@@ -199,7 +242,7 @@ public class GameUI extends JPanel {
             g2d.setFont(font);
             metrics = g.getFontMetrics();
 
-            drawCircle(g2d, origin, 250, true, true, 0x4488FF, 0);
+            drawCircle(g2d, origin, 390, true, true, 0x4488FF, 0);
 
             // Setup Hexagon Array
             for(int i = 0; i < 19; i++){
@@ -251,20 +294,31 @@ public class GameUI extends JPanel {
 
             // Setup the Corner Array
             for(int i = 0; i < 54; i++){
-                Corner2D[i] = new Ellipse2D.Double((XPoints[i]-7+origin.x), (YPoints[i]-7+origin.y), 14, 14);
+                Corner2D[i] = new Ellipse2D.Double((XPoints[i]-10+origin.x), (YPoints[i]-10+origin.y), 20, 20);
             }
 
             // draw hexes
+            Color defaultColor = new Color(0x000000);
             for(int i = 0; i < 19; i++){
                 Hex hex = hexList.get(i);
                 g2d.setColor(resourceTypeColorMap.get(hex.getHexResourceType()));
                 g2d.fill(Hexes2D[i]);
-                g2d.setColor(new Color(0xFFDD88));
-                g2d.draw(Hexes2D[i]);
+                g2d.setColor(defaultColor);
+                int val = hex.getHexValue();
+                String text = String.format("%s", val);
+                if(val == 0){
+                    text = "R";
+                }
+                int w = metrics.stringWidth(text);
+                int h = metrics.getHeight();
+                g2d.drawString(text, XCenters[i]+origin.x-w/2, YCenters[i]+origin.y+h/2);
+            }
+
+            for(int i = 0; i < 19; i++){
+
             }
 
             Color color;
-            Color defaultColor;
             Integer playerId;
 
             // draw edges
@@ -298,6 +352,7 @@ public class GameUI extends JPanel {
                 g2d.setColor(color);
                 g2d.fill(Corner2D[i]);
             }
+
         }
 
         public void drawCircle(Graphics2D g, Point origin, int radius,
@@ -401,8 +456,8 @@ public class GameUI extends JPanel {
 
     private class ControlPanel extends JPanel {
 
-        private final int WIDTH = 400;
-        private final int HEIGHT = 800;
+        private final int WIDTH = 190;
+        private final int HEIGHT = 390;
 
         private final JLabel controlPanelLabel = new JLabel("Control Panel");
 
@@ -516,8 +571,8 @@ public class GameUI extends JPanel {
     }
 
     private class ResourcePanel extends JPanel {
-        private final int WIDTH = 800;
-        private final int HEIGHT = 200;
+        private final int WIDTH = 190;
+        private final int HEIGHT = 600;
 
         private final JLabel resourceBoxLabel = new JLabel("Resource Panel");
         private final JLabel wheatCountLabel = new JLabel();
@@ -539,7 +594,7 @@ public class GameUI extends JPanel {
         };
 
         public ResourcePanel() {
-            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
