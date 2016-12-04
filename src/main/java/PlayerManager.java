@@ -33,6 +33,8 @@ public class PlayerManager {
         // reset (wrap) the player index
         if((currentPlayerIndex + 1) > numPlayers)
             currentPlayerIndex = 0;
+
+        currentPlayer = playersList.get(currentPlayerIndex);
     }
 
     public Player getPlayerById(int playerId) {

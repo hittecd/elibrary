@@ -1,18 +1,12 @@
-import com.sun.org.apache.xpath.internal.res.XPATHErrorResources;
-import javafx.scene.control.Control;
-import javafx.scene.shape.Circle;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.border.Border;
 
 public class GameUI extends JPanel {
 
@@ -26,7 +20,7 @@ public class GameUI extends JPanel {
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPane = new BoardPanel();
 
-    private final JOptionPane errorOptionPain = new JOptionPane();
+    private final JOptionPane notificationPane = new JOptionPane();
 
     /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
@@ -406,7 +400,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -422,7 +416,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -438,7 +432,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -480,7 +474,7 @@ public class GameUI extends JPanel {
         private final JButton buyCityBtn = new JButton("Buy City");
         private final JButton buyDevelopmentCardBtn = new JButton("Buy Development Card");
 
-        private final JButton playDevelopmentCard = new JButton("Play Development Card");
+        private final JButton playDevelopmentCardBtn = new JButton("Play Development Card");
 
         private final JButton startTurnBtn = new JButton("Start Turn");
         private final JButton endTurnBtn = new JButton("End Turn");
@@ -496,7 +490,34 @@ public class GameUI extends JPanel {
 
         private final ActionListener controlPanelActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controlPanelListener.onStartTurn();
+                MoveResult result;
+
+                if(e.getSource() == buyRoadBtn) {
+                    result = controlPanelListener.onBuyRoad();
+                }
+                else if(e.getSource() == buySettlementBtn) {
+                    result = controlPanelListener.onBuySettlement();
+                }
+                else if(e.getSource() == buyCityBtn) {
+                    result = controlPanelListener.onBuyCity();
+                }
+                else if(e.getSource() == buyDevelopmentCardBtn) {
+                    result = controlPanelListener.onBuyDevCard();
+                }
+                else if(e.getSource() == playDevelopmentCardBtn) {
+                    result = controlPanelListener.onPlayDevCard();
+                }
+                else if(e.getSource() == startTurnBtn) {
+                    result = controlPanelListener.onStartTurn();
+                }
+                else if(e.getSource() == endTurnBtn) {
+                    result = controlPanelListener.onEndTurn();
+                }
+                else
+                    result = new MoveResult(false, "Could not handle ActionEvent");
+
+                if (result.getMessage() != null && !result.getMessage().isEmpty())
+                    notificationPane.showMessageDialog(null, result.getMessage());
             }
         };
 
@@ -504,7 +525,13 @@ public class GameUI extends JPanel {
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+            buyRoadBtn.addActionListener(controlPanelActionListener);
+            buySettlementBtn.addActionListener(controlPanelActionListener);
+            buyCityBtn.addActionListener(controlPanelActionListener);
+            buyDevelopmentCardBtn.addActionListener(controlPanelActionListener);
+            playDevelopmentCardBtn.addActionListener(controlPanelActionListener);
             startTurnBtn.addActionListener(controlPanelActionListener);
+            endTurnBtn.addActionListener(controlPanelActionListener);
 
             this.add(controlPanelLabel);
             this.add(gameStateLablel);
@@ -513,7 +540,7 @@ public class GameUI extends JPanel {
             this.add(buySettlementBtn);
             this.add(buyCityBtn);
             this.add(buyDevelopmentCardBtn);
-            this.add(playDevelopmentCard);
+            this.add(playDevelopmentCardBtn);
             this.add(startTurnBtn);
             this.add(endTurnBtn);
         }
@@ -524,23 +551,23 @@ public class GameUI extends JPanel {
     }
 
     public interface ControlPanelListener {
-        void onBuyRoad();
+        MoveResult onBuyRoad();
 
-        void onBuySettlement();
+        MoveResult onBuySettlement();
 
-        void onBuyCity();
+        MoveResult onBuyCity();
 
-        void onBuyDevCard();
+        MoveResult onBuyDevCard();
 
-        void onPlayDevCard();
+        MoveResult onPlayDevCard();
 
-        void onTradePlayers();
+        MoveResult onTradePlayers();
 
-        void onTradeBank();
+        MoveResult onTradeBank();
 
-        void onStartTurn();
+        MoveResult onStartTurn();
 
-        void onEndTurn();
+        MoveResult onEndTurn();
 
         void onExitGame();
 
