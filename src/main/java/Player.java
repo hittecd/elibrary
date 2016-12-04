@@ -37,8 +37,8 @@ public class Player {
         resourceCards.put(ResourceType.BRICK, 0);
     }
 
-    public int getResourceCount(ResourceType resourceType) {
-        return resourceCards.get(resourceType);
+    public Map<ResourceType, Integer> getResourceCards() {
+        return resourceCards;
     }
 
     public void addResourceCards(Map<ResourceType, Integer> newResourceCards) {

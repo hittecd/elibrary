@@ -1,3 +1,4 @@
+import javafx.scene.control.Control;
 import javafx.scene.shape.Circle;
 
 import java.awt.*;
@@ -18,28 +19,31 @@ public class GameUI extends JPanel {
 
     private final JPanel leftPane = new JPanel();
     private final JPanel rightPane = new JPanel();
-    private final JPanel resourcePane = new ResourcePanel();
-    private final JPanel controlPanel = new ControlPanel();
+
+    private final ResourcePanel resourcePane = new ResourcePanel();
+    private final ControlPanel controlPanel = new ControlPanel();
     private final JPanel boardPane;
 
     private final JLabel resourceBoxLabel = new JLabel("Resource Panel:");
-    private final JLabel controlPanelLabel = new JLabel("Control Panel:");
 
     private final JOptionPane errorOptionPain = new JOptionPane();
 
+    /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
         public void updateState(GameState newState) {
             gameState = newState;
         }
     };
+    */
 
     private BoardPanelListener boardPanelListener;
     private ControlPanelListener controlPanelListener;
+    private ResourcePanelListener resourcePanelListener;
 
-    private GameState gameState;
+    //private GameState gameState;
 
     public GameUI(Game game, List<Hex> hexList, List<Edge> edgeList, List<Corner> cornerList) {
-        game.registerUpdateStateListener(updateStateListener);
+        //game.registerUpdateStateListener(updateStateListener);
 
         Border blackline = BorderFactory.createLineBorder(Color.BLACK);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -49,9 +53,9 @@ public class GameUI extends JPanel {
 
         resourcePane.setBorder(blackline);
         resourcePane.add(resourceBoxLabel);
+        game.registerUpdateStateListener(resourcePane.getUpdateStateListener());
 
-        controlPanel.setBorder(blackline);
-        controlPanel.add(controlPanelLabel);
+        game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
 
         leftPane.setPreferredSize(new Dimension(800,800));
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -74,6 +78,10 @@ public class GameUI extends JPanel {
 
     public void setControlPanelListener(ControlPanelListener listener) {
         controlPanelListener = listener;
+    }
+
+    public void setResourcePanelListener(ResourcePanelListener listener) {
+        resourcePanelListener = listener;
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
@@ -381,15 +389,55 @@ public class GameUI extends JPanel {
         MoveResult onEdgeClick(int edgeId);
 
         MoveResult onHexClick(int hexId);
-    };
+    }
 
     private class ControlPanel extends JPanel {
 
         private final int WIDTH = 390;
         private final int HEIGHT = 790;
 
+        private final JLabel controlPanelLabel = new JLabel("Control Panel");
+
+        private final JLabel gameStateLablel = new JLabel("Game State: ");
+        private final JLabel currentPlayerLabel = new JLabel("Current Player: ");
+
+        private final JButton buyRoadBtn = new JButton("Buy Road");
+        private final JButton buySettlementBtn = new JButton("Buy Settlement");
+        private final JButton buyCityBtn = new JButton("Buy City");
+        private final JButton buyDevelopmentCardBtn = new JButton("Buy Development Card");
+
+        private final JButton playDevelopmentCard = new JButton("Play Development Card");
+
+        private final JButton startTurnBtn = new JButton("Start Turn");
+        private final JButton endTurnBtn = new JButton("End Turn");
+
+        private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+                Player currentPlayer = controlPanelListener.onGetNextPlayer();
+                currentPlayerLabel.setText("Current Player: " + currentPlayer.getPlayerId());
+                gameStateLablel.setText("Game State: " + newState);
+
+            }
+        };
+
         public ControlPanel() {
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+            this.add(controlPanelLabel);
+            this.add(gameStateLablel);
+            this.add(currentPlayerLabel);
+            this.add(buyRoadBtn);
+            this.add(buySettlementBtn);
+            this.add(buyCityBtn);
+            this.add(buyDevelopmentCardBtn);
+            this.add(playDevelopmentCard);
+            this.add(startTurnBtn);
+            this.add(endTurnBtn);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return updateStateListener;
         }
     }
 
@@ -413,15 +461,49 @@ public class GameUI extends JPanel {
         void onEndTurn();
 
         void onExitGame();
-    };
 
-    private class ResourcePanel extends JPanel{
+        Player onGetNextPlayer();
+    }
 
+    private class ResourcePanel extends JPanel {
         private final int WIDTH = 790;
         private final int HEIGHT = 190;
 
+        private final JLabel wheatCountLabel = new JLabel();
+        private final JLabel sheepCountLabel = new JLabel();
+        private final JLabel lumberCountLabel = new JLabel();
+        private final JLabel oreCountLabel = new JLabel();
+        private final JLabel brickCountLabel = new JLabel();
+
+        public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+                Map<ResourceType, Integer> resourceMap = resourcePanelListener.onUpdateResourcePanel();
+
+                wheatCountLabel.setText("Wheat: " + resourceMap.get(ResourceType.WHEAT));
+                sheepCountLabel.setText("Sheep: " + resourceMap.get(ResourceType.SHEEP));
+                lumberCountLabel.setText("Lumber: " + resourceMap.get(ResourceType.LUMBER));
+                brickCountLabel.setText("Brick: " + resourceMap.get(ResourceType.BRICK));
+                oreCountLabel.setText("Ore: " + resourceMap.get(ResourceType.ORE));
+            }
+        };
+
         public ResourcePanel() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+            this.add(wheatCountLabel);
+            this.add(sheepCountLabel);
+            this.add(lumberCountLabel);
+            this.add(oreCountLabel);
+            this.add(brickCountLabel);
         }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return this.updateStateListener;
+        }
+    }
+
+    public interface ResourcePanelListener {
+        Map<ResourceType, Integer> onUpdateResourcePanel();
     }
 }

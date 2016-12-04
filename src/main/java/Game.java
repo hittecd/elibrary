@@ -1,6 +1,7 @@
 import javax.naming.ldap.Control;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class Game {
@@ -60,6 +61,10 @@ public class Game {
         public void onEndTurn() {}
 
         public void onExitGame() {}
+
+        public Player onGetNextPlayer() {
+            return playerManager.getCurrentPlayer();
+        }
     };
     private final GameUI.BoardPanelListener boardPanelListener = new GameUI.BoardPanelListener() {
         public MoveResult onCornerClick(int cornerId) {
@@ -115,6 +120,12 @@ public class Game {
             return result;
         }
     };
+    private final GameUI.ResourcePanelListener resourcePanelLister = new GameUI.ResourcePanelListener() {
+        public Map<ResourceType, Integer> onUpdateResourcePanel() {
+            Player currentPlayer = playerManager.getCurrentPlayer();
+            return currentPlayer.getResourceCards();
+        }
+    };
 
     private GameState gameState;
 
@@ -131,6 +142,7 @@ public class Game {
         gameUI = new GameUI(this, hexList, edgeList, cornerList);
         gameUI.setBoardPanelListener(boardPanelListener);
         gameUI.setControlPanelListener(controlPanelListener);
+        gameUI.setResourcePanelListener(resourcePanelLister);
 
         updateState(GameState.SETUP_BOARD);
     }
@@ -170,12 +182,10 @@ public class Game {
             SetupStage stage = setupStages.get(setupStageIndex);
             Player player = playerManager.getPlayerById(stage.playerId);
 
-            if(stage.gameState != GameState.BUILD_SETTLEMENT) {
+            if(stage.gameState != GameState.BUILD_SETTLEMENT)
                 result = new MoveResult(false, "Select Edge to build Road.");
-            }
-            else {
+            else
                 result = board.buildSettlement(player, cornerId);
-            }
 
             if(result.isSuccess())
                 setupStageIndex++;
@@ -198,7 +208,6 @@ public class Game {
 
             if(result.isSuccess())
                 setupStageIndex++;
-
 
             if(setupStageIndex == (numPlayers*4))
                 updateState(GameState.START_TURN);
