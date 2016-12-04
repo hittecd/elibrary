@@ -70,6 +70,16 @@ public class Board {
         return null;
     }
 
+    public List<Hex> getHexesByRollValue(int rollVal) {
+        List<Hex> result = new ArrayList<Hex>();
+
+        for(Hex h : hexIndex)
+            if(h.getHexValue() == rollVal)
+                result.add(h);
+
+        return result;
+    }
+
     //TODO: return deep copy of hexIndex
     public List<Hex> getHexList() {
         return new ArrayList<Hex>(hexIndex);

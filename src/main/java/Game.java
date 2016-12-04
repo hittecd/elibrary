@@ -2,6 +2,7 @@ import javax.naming.ldap.Control;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 public class Game {
@@ -42,7 +43,10 @@ public class Game {
     private final PlayerManager playerManager;
     private final GameUI gameUI;
     private final GameUI.ControlPanelListener controlPanelListener = new GameUI.ControlPanelListener() {
-        public void onBuyRoad() {}
+        public void onBuyRoad() {
+            Player p = playerManager.getCurrentPlayer();
+            //p.buySettlement();
+        }
 
         public void onBuySettlement() {}
 
@@ -56,7 +60,17 @@ public class Game {
 
         public void onTradeBank() {}
 
-        public void onStartTurn() {}
+        public void onStartTurn() {
+            rollVal = rollDice();
+
+            List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
+            Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
+
+            for(Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
+                bank.allocateResourceCards(resourceMap);
+
+            updateState(GameState.TURN_STARTED);
+        }
 
         public void onEndTurn() {}
 
@@ -140,6 +154,7 @@ public class Game {
     };
 
     private GameState gameState;
+    private int rollVal;
 
     public Game(int numPlayers) {
         this.numPlayers = numPlayers;
@@ -161,6 +176,13 @@ public class Game {
 
     public GameUI getGameUI() {
         return gameUI;
+    }
+
+    private int rollDice() {
+        Random r = new Random();
+        int low = 2;
+        int high = 12;
+        return (r.nextInt(high-low) + low);
     }
 
     private class SetupBoardManager {

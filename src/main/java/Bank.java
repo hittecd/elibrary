@@ -132,35 +132,18 @@ public class Bank {
         int allocatedCount;
         int newCount;
 
-        // allocate 'SHEEP' cards
-        currentCount = resourceMap.get(ResourceType.SHEEP);
-        allocatedCount = allocatedCards.get(ResourceType.SHEEP);
-        newCount = currentCount - allocatedCount;
-        resourceMap.put(ResourceType.SHEEP, (newCount >= 0 ? newCount : 0));
+        if (allocatedCards == null || allocatedCards.isEmpty())
+            return;
 
-        // allocate 'WHEAT' cards
-        currentCount = resourceMap.get(ResourceType.WHEAT);
-        allocatedCount = allocatedCards.get(ResourceType.WHEAT);
-        newCount = currentCount - allocatedCount;
-        resourceMap.put(ResourceType.WHEAT, (newCount >= 0 ? newCount : 0));
+        for (ResourceType resourceType : allocatedCards.keySet()) {
+            if (allocatedCards.get(resourceType) == null)
+                continue;
 
-        // allocate 'LUMBER' cards
-        currentCount = resourceMap.get(ResourceType.LUMBER);
-        allocatedCount = allocatedCards.get(ResourceType.LUMBER);
-        newCount = currentCount - allocatedCount;
-        resourceMap.put(ResourceType.LUMBER, (newCount >= 0 ? newCount : 0));
-
-        // allocate 'ORE' cards
-        currentCount = resourceMap.get(ResourceType.ORE);
-        allocatedCount = allocatedCards.get(ResourceType.ORE);
-        newCount = currentCount - allocatedCount;
-        resourceMap.put(ResourceType.ORE, (newCount >= 0 ? newCount : 0));
-
-        // allocate 'BRICK' cards
-        currentCount = resourceMap.get(ResourceType.BRICK);
-        allocatedCount = allocatedCards.get(ResourceType.BRICK);
-        newCount = currentCount - allocatedCount;
-        resourceMap.put(ResourceType.BRICK, (newCount >= 0 ? newCount : 0));
+            allocatedCount = allocatedCards.get(resourceType);
+            currentCount = resourceMap.get(resourceType);
+            newCount = currentCount - allocatedCount;
+            resourceMap.put(resourceType, (newCount >= 0 ? newCount : 0));
+        }
     }
 
     public void addResourceCards(Hashtable<ResourceType, Integer> newCards) {

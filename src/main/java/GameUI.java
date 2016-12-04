@@ -2,6 +2,7 @@ import javafx.scene.control.Control;
 import javafx.scene.shape.Circle;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -427,10 +428,18 @@ public class GameUI extends JPanel {
             }
         };
 
+        private final ActionListener controlPanelActionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                controlPanelListener.onStartTurn();
+            }
+        };
+
         public ControlPanel() {
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+            startTurnBtn.addActionListener(controlPanelActionListener);
 
             this.add(controlPanelLabel);
             this.add(gameStateLablel);

@@ -29,6 +29,9 @@ public class GameManager {
         mainGameFrameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainGameFrameUI.setExtendedState(JFrame.MAXIMIZED_BOTH); // set ui to full screen
         mainGameFrameUI.setVisible(true);
+
+        //TODO: remove this
+        //newGame(3);
     }
 
     private void newGame(int numPlayers) {

@@ -21,7 +21,7 @@ public class Hex {
     }
 
     public List<Edge> getEdges() {
-        return edges;
+        return new ArrayList(edges);
     }
 
     public void initEdges(List<Edge> edges) {
@@ -30,7 +30,7 @@ public class Hex {
     }
 
     public List<Corner> getCorners() {
-        return corners;
+        return new ArrayList<Corner>(corners);
     }
 
     public void initCorners(List<Corner> corners) {

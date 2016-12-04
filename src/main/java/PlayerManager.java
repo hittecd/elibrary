@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class PlayerManager {
@@ -39,6 +41,42 @@ public class PlayerManager {
         for(Player player : playersList) {
             if (player.getPlayerId() == playerId)
                 result = player;
+        }
+
+        return result;
+    }
+
+    public Map<Player, Map<ResourceType, Integer>> resolveResources(List<Hex> hexList) {
+        Map<Player, Map<ResourceType, Integer>> result = new HashMap();
+        Map<ResourceType, Integer> resourceMap;
+        ResourceType resourceType;
+        int resourceCount;
+
+        for(Player p : playersList) {
+            resourceMap = new HashMap();
+
+            for (Hex h : hexList) {
+                resourceType = h.getHexResourceType();
+
+                if(resourceMap.get(resourceType) == null)
+                    resourceCount = 0;
+                else
+                    resourceCount = resourceMap.get(h.getHexResourceType());
+
+                for(Corner c : h.getCorners())
+                    if(c.getPlayerId() == p.getPlayerId()) {
+                        if(c.hasCity())
+                            resourceCount += 2;
+                        else
+                            resourceCount++;
+                    }
+
+                resourceMap.put(resourceType, resourceCount);
+            }
+
+            p.addResourceCards(resourceMap);
+
+            result.put(p, resourceMap);
         }
 
         return result;
