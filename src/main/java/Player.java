@@ -42,11 +42,49 @@ public class Player {
     }
 
     public void addResourceCards(Map<ResourceType, Integer> newResourceCards) {
+        Integer newCount;
+        Integer currentCount;
 
+        for(ResourceType resourceType : newResourceCards.keySet()) {
+            newCount = newResourceCards.get(resourceType);
+            if(newCount == null)
+                newCount = new Integer(0);
+
+            currentCount = resourceCards.get(resourceType);
+            if(currentCount == null)
+                currentCount = new Integer(0);
+
+            resourceCards.put(resourceType, currentCount + newCount);
+        }
     }
 
-    public void spendResourceCards(Map<ResourceType, Integer> spentResourceCards) {
+    public boolean spendResourceCards(Map<ResourceType, Integer> spentResourceCards) {
+        Integer currentCount;
+        Integer removeCount;
+        boolean success = true;
+        Map<ResourceType, Integer> updatedResourceMap = new HashMap();
 
+        for(ResourceType resourceType : spentResourceCards.keySet()) {
+            currentCount = resourceCards.get(resourceType);
+            if(currentCount == null)
+                currentCount = new Integer(0);
+
+            removeCount = spentResourceCards.get(resourceType);
+            if(removeCount == null)
+                removeCount = new Integer(0);
+
+            if((currentCount - removeCount) >= 0)
+                updatedResourceMap.put(resourceType, (currentCount - removeCount));
+            else
+                success = false;
+        }
+
+        if(success) {
+            for(ResourceType resourceType : resourceCards.keySet())
+                resourceCards.put(resourceType, updatedResourceMap.get(resourceType));
+        }
+
+        return success;
     }
 
     private void initDevelopmentCards() {

@@ -1,8 +1,5 @@
 import javax.naming.ldap.Control;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 
 public class Game {
@@ -43,36 +40,140 @@ public class Game {
     private final PlayerManager playerManager;
     private final GameUI gameUI;
     private final GameUI.ControlPanelListener controlPanelListener = new GameUI.ControlPanelListener() {
-        public void onBuyRoad() {
+        public MoveResult onBuyRoad() {
+            MoveResult result;
+
+            if(gameState != GameState.TURN_STARTED)
+                return new MoveResult(false, "You cannot buy a Road at this time");
+
+            Map<ResourceType, Integer> roadCards = new HashMap();
+            roadCards.put(ResourceType.BRICK, 1);
+            roadCards.put(ResourceType.LUMBER, 1);
+
             Player p = playerManager.getCurrentPlayer();
-            //p.buySettlement();
+
+            // validate player resources
+            if(!p.spendResourceCards(roadCards)) {
+                result = new MoveResult(false,
+                        "Player does not have required resources for a Road:\n" +
+                        "\t1 - LUMBER\n" +
+                        "\t1 - BRICK\n"
+                );
+            }
+            else {
+                bank.allocateResourceCards(roadCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.BUILD_ROAD);
+            }
+
+            return result;
         }
 
-        public void onBuySettlement() {}
+        public MoveResult onBuySettlement() {
+            MoveResult result;
 
-        public void onBuyCity() {}
+            if(gameState != GameState.TURN_STARTED)
+                return new MoveResult(false, "You cannot buy a Settlement at this time");
 
-        public void onBuyDevCard() {}
+            Map<ResourceType, Integer> settlementCards = new HashMap();
+            settlementCards.put(ResourceType.SHEEP, 1);
+            settlementCards.put(ResourceType.WHEAT, 1);
+            settlementCards.put(ResourceType.BRICK, 1);
+            settlementCards.put(ResourceType.LUMBER, 1);
 
-        public void onPlayDevCard() {}
+            Player p = playerManager.getCurrentPlayer();
 
-        public void onTradePlayers() {}
+            // validate player resources
+            if(!p.spendResourceCards(settlementCards)) {
+                result = new MoveResult(false,
+                        "Player does not have required resources for a Settlement:\n" +
+                                "\t1 - WHEAT\n" +
+                                "\t1 - SHEEP\n" +
+                                "\t1 - LUMBER\n" +
+                                "\t1 - BRICK\n"
+                );
+            }
+            else {
+                bank.allocateResourceCards(settlementCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.BUILD_SETTLEMENT);
+            }
 
-        public void onTradeBank() {}
-
-        public void onStartTurn() {
-            rollVal = rollDice();
-
-            List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
-            Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
-
-            for(Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
-                bank.allocateResourceCards(resourceMap);
-
-            updateState(GameState.TURN_STARTED);
+            return result;
         }
 
-        public void onEndTurn() {}
+        public MoveResult onBuyCity() {
+            MoveResult result;
+
+            if(gameState != GameState.TURN_STARTED)
+                return new MoveResult(false, "You cannot buy a City at this time");
+
+            Map<ResourceType, Integer> cityCards = new HashMap();
+            cityCards.put(ResourceType.ORE, 3);
+            cityCards.put(ResourceType.WHEAT, 2);
+
+            Player p = playerManager.getCurrentPlayer();
+
+            // validate player resources
+            if(!p.spendResourceCards(cityCards)) {
+                result = new MoveResult(false,
+                        "Player does not have required resources for a City:\n" +
+                                "\t3 - ORE\n" +
+                                "\t2 - WHEAT\n"
+                );
+            }
+            else {
+                bank.allocateResourceCards(cityCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.BUILD_CITY);
+            }
+
+            return result;
+        }
+
+        public MoveResult onBuyDevCard() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onPlayDevCard() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onTradePlayers() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onTradeBank() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onStartTurn() {
+            MoveResult result;
+
+            if(gameState != GameState.START_TURN) {
+                result = new MoveResult(false, "Cannot Start Turn at this time");
+            }
+            else {
+
+                rollVal = rollDice();
+
+                List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
+                Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
+
+                for (Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
+                    bank.allocateResourceCards(resourceMap);
+
+                updateState(GameState.TURN_STARTED);
+
+                result = new MoveResult(true, "");
+            }
+
+            return result;
+        }
+
+        public MoveResult onEndTurn() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
 
         public void onExitGame() {}
 
