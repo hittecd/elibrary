@@ -74,7 +74,7 @@ public class Player {
                 removeCount = new Integer(0);
 
             if((currentCount - removeCount) >= 0)
-                updatedResourceMap.put(resourceType, (currentCount - removeCount));
+                updatedResourceMap.put(resourceType, new Integer(currentCount - removeCount));
             else
                 success = false;
         }

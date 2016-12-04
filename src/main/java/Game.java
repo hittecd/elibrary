@@ -49,6 +49,9 @@ public class Game {
             Map<ResourceType, Integer> roadCards = new HashMap();
             roadCards.put(ResourceType.BRICK, 1);
             roadCards.put(ResourceType.LUMBER, 1);
+            roadCards.put(ResourceType.WHEAT, 0);
+            roadCards.put(ResourceType.SHEEP, 0);
+            roadCards.put(ResourceType.ORE, 0);
 
             Player p = playerManager.getCurrentPlayer();
 
@@ -80,6 +83,7 @@ public class Game {
             settlementCards.put(ResourceType.WHEAT, 1);
             settlementCards.put(ResourceType.BRICK, 1);
             settlementCards.put(ResourceType.LUMBER, 1);
+            settlementCards.put(ResourceType.ORE, 0);
 
             Player p = playerManager.getCurrentPlayer();
 
@@ -111,6 +115,9 @@ public class Game {
             Map<ResourceType, Integer> cityCards = new HashMap();
             cityCards.put(ResourceType.ORE, 3);
             cityCards.put(ResourceType.WHEAT, 2);
+            cityCards.put(ResourceType.SHEEP, 0);
+            cityCards.put(ResourceType.LUMBER, 0);
+            cityCards.put(ResourceType.BRICK, 0);
 
             Player p = playerManager.getCurrentPlayer();
 
@@ -154,7 +161,6 @@ public class Game {
                 result = new MoveResult(false, "Cannot Start Turn at this time");
             }
             else {
-
                 rollVal = rollDice();
 
                 List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
@@ -165,14 +171,26 @@ public class Game {
 
                 updateState(GameState.TURN_STARTED);
 
-                result = new MoveResult(true, "");
+                result = new MoveResult(true, "A " + rollVal + " was rolled!");
             }
 
             return result;
         }
 
         public MoveResult onEndTurn() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
+            MoveResult result;
+
+            if(gameState != GameState.TURN_STARTED)
+                result = new MoveResult(false, "Cannot End Turn at this time");
+            else {
+                playerManager.updateCurrentPlayer();
+
+                updateState(GameState.START_TURN);
+
+                result = new MoveResult(true, "");
+            }
+
+            return result;
         }
 
         public void onExitGame() {}
@@ -193,6 +211,8 @@ public class Game {
             }
             else if(gameState == GameState.BUILD_SETTLEMENT) {
                 result = board.buildSettlement(currentPlayer, cornerId);
+                if(result.isSuccess())
+                    updateState(GameState.TURN_STARTED);
             }
             else if(gameState == GameState.BUILD_CITY) {
                 result = board.buildCity(currentPlayer, cornerId);
@@ -214,6 +234,8 @@ public class Game {
             }
             else if(gameState == GameState.BUILD_ROAD) {
                 result = board.buildRoad(currentPlayer, edgeId);
+                if(result.isSuccess())
+                    updateState(GameState.TURN_STARTED);
             }
             else
                 result = new MoveResult(false, "Cannot build Road at this time.");

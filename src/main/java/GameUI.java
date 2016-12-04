@@ -1,18 +1,12 @@
-import com.sun.org.apache.xpath.internal.res.XPATHErrorResources;
-import javafx.scene.control.Control;
-import javafx.scene.shape.Circle;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.border.Border;
 
 public class GameUI extends JPanel {
 
@@ -26,7 +20,7 @@ public class GameUI extends JPanel {
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPane = new BoardPanel();
 
-    private final JOptionPane errorOptionPain = new JOptionPane();
+    private final JOptionPane notificationPane = new JOptionPane();
 
     /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
@@ -392,7 +386,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -408,7 +402,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -424,7 +418,7 @@ public class GameUI extends JPanel {
                         this.repaint();
                     }
                     else
-                        errorOptionPain.showMessageDialog(null, result.getMessage());
+                        notificationPane.showMessageDialog(null, result.getMessage());
 
                     return;
                 }
@@ -511,8 +505,8 @@ public class GameUI extends JPanel {
                 else
                     result = new MoveResult(false, "Could not handle ActionEvent");
 
-                if (!result.isSuccess())
-                    errorOptionPain.showMessageDialog(null, result.getMessage());
+                if (result.getMessage() != null && !result.getMessage().isEmpty())
+                    notificationPane.showMessageDialog(null, result.getMessage());
             }
         };
 
