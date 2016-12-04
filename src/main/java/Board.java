@@ -70,16 +70,19 @@ public class Board {
         return null;
     }
 
+    //TODO: return deep copy of hexIndex
     public List<Hex> getHexList() {
-        return hexIndex;
+        return new ArrayList<Hex>(hexIndex);
     }
 
+    //TODO: return deep copy of hexIndex
     public List<Edge> getEdgeList() {
-        return edgeIndex;
+        return new ArrayList<Edge>(edgeIndex);
     }
 
+    //TODO: return deep copy of hexIndex
     public List<Corner> getCornerList() {
-        return cornerIndex;
+        return new ArrayList<Corner>(cornerIndex);
     }
 
     private void initEdges() {

@@ -22,9 +22,7 @@ public class GameUI extends JPanel {
 
     private final ResourcePanel resourcePane = new ResourcePanel();
     private final ControlPanel controlPanel = new ControlPanel();
-    private final JPanel boardPane;
-
-    private final JLabel resourceBoxLabel = new JLabel("Resource Panel:");
+    private final BoardPanel boardPane = new BoardPanel();
 
     private final JOptionPane errorOptionPain = new JOptionPane();
 
@@ -42,30 +40,20 @@ public class GameUI extends JPanel {
 
     //private GameState gameState;
 
-    public GameUI(Game game, List<Hex> hexList, List<Edge> edgeList, List<Corner> cornerList) {
+    public GameUI(Game game) {
         //game.registerUpdateStateListener(updateStateListener);
 
-        Border blackline = BorderFactory.createLineBorder(Color.BLACK);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        boardPane = new BoardPanel(hexList, edgeList, cornerList);
-        boardPane.setBorder(blackline);
-
-        resourcePane.setBorder(blackline);
-        resourcePane.add(resourceBoxLabel);
+        game.registerUpdateStateListener(boardPane.getUpdateStateListener());
         game.registerUpdateStateListener(resourcePane.getUpdateStateListener());
-
         game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
 
-        leftPane.setPreferredSize(new Dimension(800,800));
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
-        leftPane.setBorder(blackline);
         leftPane.add(boardPane);
         leftPane.add(resourcePane);
 
-        rightPane.setPreferredSize(new Dimension(400, 800));
         rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
-        rightPane.setBorder(blackline);
         rightPane.add(controlPanel);
 
         this.add(leftPane);
@@ -85,16 +73,15 @@ public class GameUI extends JPanel {
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
-
-        private final int WIDTH = 790;
-        private final int HEIGHT = 590;
+        private final int WIDTH = 800;
+        private final int HEIGHT = 600;
 
         private final Map<ResourceType, Color> resourceTypeColorMap = new HashMap<ResourceType, Color>();
         private final Map<Integer, Color> playerColorMap = new HashMap<Integer, Color>();
 
-        private final List<Hex> hexList;
-        private final List<Edge> edgeList;
-        private final List<Corner> cornerList;
+        private List<Hex> hexList = null;
+        private List<Edge> edgeList = null;
+        private List<Corner> cornerList = null;
 
         // This array holds all 54 X values for the corners.
         private final int[] XPoints = { -25, 25,
@@ -161,13 +148,20 @@ public class GameUI extends JPanel {
         private Font font = new Font("Arial", Font.BOLD, 18);
         FontMetrics metrics;
 
-        public BoardPanel(List<Hex> hexList, List<Edge> edgeList, List<Corner> cornerList) {
+        public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+                hexList = boardPanelListener.onUpdateHexList();
+                edgeList = boardPanelListener.onUpdateEdgeList();
+                cornerList = boardPanelListener.onUpdateCornerList();
+
+
+            }
+        };
+
+        public BoardPanel() {
             addMouseListener(this);
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
-
-            this.hexList = hexList;
-            this.edgeList = edgeList;
-            this.cornerList = cornerList;
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));;
 
             initColorMap();
             initPlayerColorMap();
@@ -189,7 +183,14 @@ public class GameUI extends JPanel {
             playerColorMap.put(3, new Color(0xFFFF00));
         }
 
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return updateStateListener;
+        }
+
         public void paintComponent(Graphics g) {
+            if(hexList == null || edgeList == null || cornerList == null)
+                return;
+
             Graphics2D g2d = (Graphics2D) g;
             Point origin = new Point(WIDTH / 2, HEIGHT / 2);
 
@@ -389,6 +390,12 @@ public class GameUI extends JPanel {
         MoveResult onEdgeClick(int edgeId);
 
         MoveResult onHexClick(int hexId);
+
+        List<Hex> onUpdateHexList();
+
+        List<Edge> onUpdateEdgeList();
+
+        List<Corner> onUpdateCornerList();
     }
 
     private class ControlPanel extends JPanel {
@@ -423,6 +430,7 @@ public class GameUI extends JPanel {
         public ControlPanel() {
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             this.add(controlPanelLabel);
             this.add(gameStateLablel);
@@ -466,9 +474,10 @@ public class GameUI extends JPanel {
     }
 
     private class ResourcePanel extends JPanel {
-        private final int WIDTH = 790;
-        private final int HEIGHT = 190;
+        private final int WIDTH = 800;
+        private final int HEIGHT = 200;
 
+        private final JLabel resourceBoxLabel = new JLabel("Resource Panel");
         private final JLabel wheatCountLabel = new JLabel();
         private final JLabel sheepCountLabel = new JLabel();
         private final JLabel lumberCountLabel = new JLabel();
@@ -490,7 +499,9 @@ public class GameUI extends JPanel {
         public ResourcePanel() {
             setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
             setPreferredSize(new Dimension(WIDTH, HEIGHT));
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+            this.add(resourceBoxLabel);
             this.add(wheatCountLabel);
             this.add(sheepCountLabel);
             this.add(lumberCountLabel);

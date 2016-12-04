@@ -119,6 +119,18 @@ public class Game {
 
             return result;
         }
+
+        public List<Hex> onUpdateHexList() {
+            return board.getHexList();
+        }
+
+        public List<Edge> onUpdateEdgeList() {
+            return board.getEdgeList();
+        }
+
+        public List<Corner> onUpdateCornerList() {
+            return board.getCornerList();
+        }
     };
     private final GameUI.ResourcePanelListener resourcePanelLister = new GameUI.ResourcePanelListener() {
         public Map<ResourceType, Integer> onUpdateResourcePanel() {

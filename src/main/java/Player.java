@@ -38,7 +38,7 @@ public class Player {
     }
 
     public Map<ResourceType, Integer> getResourceCards() {
-        return resourceCards;
+        return new HashMap<ResourceType, Integer>(resourceCards);
     }
 
     public void addResourceCards(Map<ResourceType, Integer> newResourceCards) {
