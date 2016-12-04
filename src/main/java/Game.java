@@ -35,6 +35,7 @@ public class Game {
     }
 
     private final int numPlayers;
+    private final SetupBoardManager setupBoardManager;
     private final Bank bank = new Bank();
     private final Board board = new Board();
     private final PlayerManager playerManager;
@@ -61,34 +62,57 @@ public class Game {
         public void onExitGame() {}
     };
     private final GameUI.BoardPanelListener boardPanelListener = new GameUI.BoardPanelListener() {
-        public void onCornerClick(int cornerId) {
+        public MoveResult onCornerClick(int cornerId) {
             System.out.println("CORNER DETECTED IN GAME: " + cornerId);
 
-            if(gameState == GameState.BUILD_SETTLEMENT) {
-                board.buildSettlement(cornerId);
-            }
-            else if(gameState == GameState.BUILD_CITY) {
-                board.buildCity(cornerId);
-            }
-        }
-
-        public void onEdgeClick(int edgeId) {
-            System.out.println("EDGE DETECTED IN GAME: " + edgeId);
-
+            MoveResult result;
             Player currentPlayer = playerManager.getCurrentPlayer();
 
             if(gameState == GameState.SETUP_BOARD) {
+                result = setupBoardManager.setupCorner(cornerId);
+            }
+            else if(gameState == GameState.BUILD_SETTLEMENT) {
+                result = board.buildSettlement(currentPlayer, cornerId);
+            }
+            else if(gameState == GameState.BUILD_CITY) {
+                result = board.buildCity(currentPlayer, cornerId);
+            }
+            else
+                result = new MoveResult(false, "Cannot build Settlement/City at this time.");
 
-            }
-            else if(gameState == GameState.BUILD_ROAD) {
-                board.buildRoad(currentPlayer, edgeId);
-            }
+            return result;
         }
 
-        public void onHexClick(int hexId) {
+        public MoveResult onEdgeClick(int edgeId) {
+            System.out.println("EDGE DETECTED IN GAME: " + edgeId);
+
+            MoveResult result;
+            Player currentPlayer = playerManager.getCurrentPlayer();
+
+            if(gameState == GameState.SETUP_BOARD) {
+                result = setupBoardManager.setupEdge(edgeId);
+            }
+            else if(gameState == GameState.BUILD_ROAD) {
+                result = board.buildRoad(currentPlayer, edgeId);
+            }
+            else
+                result = new MoveResult(false, "Cannot build Road at this time.");
+
+            return result;
+        }
+
+        public MoveResult onHexClick(int hexId) {
             System.out.println("HEX DETECTED IN GAME: " + hexId);
 
-            board.placeRobber(hexId);
+            MoveResult result;
+            Player currentPlayer = playerManager.getCurrentPlayer();
+
+            if(gameState == GameState.PLACE_ROBBER)
+                result = board.placeRobber(currentPlayer, hexId);
+            else
+                result = new MoveResult(false, "Cannot place Robber at this time");
+
+            return result;
         }
     };
 
@@ -96,6 +120,7 @@ public class Game {
 
     public Game(int numPlayers) {
         this.numPlayers = numPlayers;
+        setupBoardManager = new SetupBoardManager();
 
         playerManager = new PlayerManager(numPlayers);
 
@@ -115,13 +140,70 @@ public class Game {
     }
 
     private class SetupBoardManager {
-
-        int turn = 0;
+        int setupStageIndex = 0;
+        private final List<SetupStage> setupStages = new ArrayList();
 
         private SetupBoardManager() {
+            for(int i=0; i<numPlayers; i++) {
+                setupStages.add(new SetupStage(i, GameState.BUILD_SETTLEMENT));
+                setupStages.add(new SetupStage(i, GameState.BUILD_ROAD));
+            }
 
+            for(int i=(numPlayers-1); i>=0; i--) {
+                setupStages.add(new SetupStage(i, GameState.BUILD_SETTLEMENT));
+                setupStages.add(new SetupStage(i, GameState.BUILD_ROAD));
+            }
         }
 
-    }
+        private class SetupStage {
+            Integer playerId;
+            GameState gameState;
 
+            private SetupStage(int playerId, GameState gameState) {
+                this.playerId = playerId;
+                this.gameState = gameState;
+            }
+        }
+
+        private MoveResult setupCorner(int cornerId) {
+            MoveResult result;
+            SetupStage stage = setupStages.get(setupStageIndex);
+            Player player = playerManager.getPlayerById(stage.playerId);
+
+            if(stage.gameState != GameState.BUILD_SETTLEMENT) {
+                result = new MoveResult(false, "Select Edge to build Road.");
+            }
+            else {
+                result = board.buildSettlement(player, cornerId);
+            }
+
+            if(result.isSuccess())
+                setupStageIndex++;
+
+            if(setupStageIndex == (numPlayers*4))
+                updateState(GameState.START_TURN);
+
+            return result;
+        }
+
+        private MoveResult setupEdge(int edgeId) {
+            MoveResult result;
+            SetupStage stage = setupStages.get(setupStageIndex);
+            Player player = playerManager.getPlayerById(stage.playerId);
+
+            if(stage.gameState != GameState.BUILD_ROAD)
+                result = new MoveResult(false, "Select Corner to build Settlement");
+            else
+                result = board.buildRoad(player, edgeId);
+
+            if(result.isSuccess())
+                setupStageIndex++;
+
+
+            if(setupStageIndex == (numPlayers*4))
+                updateState(GameState.START_TURN);
+
+            return result;
+        }
+    }
 }

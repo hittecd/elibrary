@@ -25,6 +25,8 @@ public class GameUI extends JPanel {
     private final JLabel resourceBoxLabel = new JLabel("Resource Panel:");
     private final JLabel controlPanelLabel = new JLabel("Control Panel:");
 
+    private final JOptionPane errorOptionPain = new JOptionPane();
+
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
         public void updateState(GameState newState) {
             gameState = newState;
@@ -98,6 +100,7 @@ public class GameUI extends JPanel {
                 -175, -125, -25, 25, 125, 175,
                 -100, -50, 50, 100,
                 -25, 25};
+
         // This array holds all 54 Y values for the corners.
         private final int[] YPoints = { -220, -220,
                 -176, -176, -176, -176,
@@ -110,9 +113,11 @@ public class GameUI extends JPanel {
                 132, 132, 132, 132, 132, 132,
                 176, 176, 176, 176,
                 220, 220};
+
         public Polygon[] Hexes2D = new Polygon[19];
         public Ellipse2D.Double[] Corner2D = new Ellipse2D.Double[54];
         public Polygon[] Edges2D = new Polygon[72];
+
         private final int[][] HexPointsMap = {{0,1,4,9,8,3},
                 {2,3,8,14,13,7}, {4,5,10,16,15,9},
                 {6,7,13,19,18,12}, {8,9,15,21,20,14}, {10,11,17,23,22,16},
@@ -122,6 +127,7 @@ public class GameUI extends JPanel {
                 {30,31,37,43,42,36}, {32,33,39,45,44,38}, {34,35,41,47,46,40},
                 {37,38,44,49,48,43}, {39,40,46,51,50,45},
                 {44,45,50,53,52,49}};
+
         private final int[][] EdgePointMap = {{0,0,1},
                 {1,3,0}, {2,1,4},
                 {0,2,3}, {0,4,5},
@@ -143,7 +149,6 @@ public class GameUI extends JPanel {
                 {0,48,49}, {0,50,51},
                 {2,49,52}, {1,53,50},
                 {0,52,53}};
-
 
         private Font font = new Font("Arial", Font.BOLD, 18);
         FontMetrics metrics;
@@ -168,7 +173,6 @@ public class GameUI extends JPanel {
             resourceTypeColorMap.put(ResourceType.ORE, new Color(0x606060));
             resourceTypeColorMap.put(ResourceType.DESERT, new Color(0xcFFDD88));
         }
-
 
         private void initPlayerColorMap() {
             playerColorMap.put(0, new Color(0xFF0000));
@@ -311,10 +315,20 @@ public class GameUI extends JPanel {
         }
 
         public void mouseClicked(MouseEvent e) {
+            MoveResult result;
+
             for(int i = 0; i < 54; i++){
                 if(Corner2D[i].contains(e.getX(), e.getY())){
                     System.out.println("Mouse Clicked on Corner #" + i);
-                    boardPanelListener.onCornerClick(i);
+                    result = boardPanelListener.onCornerClick(i);
+
+                    if(result != null && result.isSuccess()) {
+                        this.revalidate();
+                        this.repaint();
+                    }
+                    else
+                        errorOptionPain.showMessageDialog(null, result.getMessage());
+
                     return;
                 }
             }
@@ -322,7 +336,15 @@ public class GameUI extends JPanel {
             for(int i = 0; i < 72; i++){
                 if(Edges2D[i].contains(e.getX(),e.getY())){
                     System.out.println("Mouse Clicked on Edge #" + i);
-                    boardPanelListener.onEdgeClick(i);
+                    result = boardPanelListener.onEdgeClick(i);
+
+                    if(result != null && result.isSuccess()) {
+                        this.revalidate();
+                        this.repaint();
+                    }
+                    else
+                        errorOptionPain.showMessageDialog(null, result.getMessage());
+
                     return;
                 }
             }
@@ -330,12 +352,18 @@ public class GameUI extends JPanel {
             for(int i = 0; i < 19; i++){
                 if(Hexes2D[i].contains(e.getX(), e.getY())) {
                     System.out.println("Mouse Clicked on Hex #" + i);
-                    boardPanelListener.onHexClick(i);
+                    result = boardPanelListener.onHexClick(i);
+
+                    if(result != null && result.isSuccess()) {
+                        this.revalidate();
+                        this.repaint();
+                    }
+                    else
+                        errorOptionPain.showMessageDialog(null, result.getMessage());
+
                     return;
                 }
             }
-
-
         }
 
         public void mousePressed(MouseEvent e) {}
@@ -348,11 +376,11 @@ public class GameUI extends JPanel {
     }
 
     public interface BoardPanelListener {
-        void onCornerClick(int cornerId);
+        MoveResult onCornerClick(int cornerId);
 
-        void onEdgeClick(int edgeId);
+        MoveResult onEdgeClick(int edgeId);
 
-        void onHexClick(int hexId);
+        MoveResult onHexClick(int hexId);
     };
 
     private class ControlPanel extends JPanel {

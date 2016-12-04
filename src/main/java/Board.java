@@ -34,20 +34,41 @@ public class Board {
         assignValuesToHexes();
     }
 
-    public void buildRoad(Player player, int edgeId) {
+    public MoveResult buildRoad(Player player, int edgeId) {
+        MoveResult result;
         Edge e = edgeIndex.get(edgeId);
 
-        if(e != null)
-            e.buildRoad(player.getPlayerId());
+        if(e.buildRoad(player.getPlayerId())) {
+            result = new MoveResult(true, "");
+            player.addEdge(e);
+        }
+        else
+            result = new MoveResult(false, "Failed to build Road. Check your placement and try again.");
 
-        player.addEdge(e);
+        return result;
     }
 
-    public void buildSettlement(int cornerId) {}
+    public MoveResult buildSettlement(Player player, int cornerId) {
+        MoveResult result;
+        Corner c = cornerIndex.get(cornerId);
 
-    public void buildCity(int cornerId) {}
+        if(c.buildSettlement(player.getPlayerId())) {
+            result = new MoveResult(true, "");
+            player.addCorner(c);
+        }
+        else
+            result = new MoveResult(false, "Failed to build Settlement. Check your placement and try again.");
 
-    public void placeRobber(int hexId) {}
+        return result;
+    }
+
+    public MoveResult buildCity(Player player, int cornerId) {
+        return null;
+    }
+
+    public MoveResult placeRobber(Player player, int hexId) {
+        return null;
+    }
 
     public List<Hex> getHexList() {
         return hexIndex;

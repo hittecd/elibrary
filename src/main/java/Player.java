@@ -64,4 +64,8 @@ public class Player {
     public void addEdge(Edge e) {
         edgesList.add(e);
     }
+
+    public void addCorner(Corner c) {
+        cornersList.add(c);
+    }
 }

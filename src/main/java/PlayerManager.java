@@ -13,7 +13,7 @@ public class PlayerManager {
         this.numPlayers = numPlayers;
 
         for(int i=0; i<numPlayers; i++) {
-            playersList.add(new Player(i+1));
+            playersList.add(new Player(i));
         }
 
         currentPlayerIndex = 0;
@@ -33,9 +33,14 @@ public class PlayerManager {
             currentPlayerIndex = 0;
     }
 
-    /**
-     * TODO: implement retrieving player by id
-     *
-     * getPlayerById(int playerId)
-     */
+    public Player getPlayerById(int playerId) {
+        Player result = null;
+
+        for(Player player : playersList) {
+            if (player.getPlayerId() == playerId)
+                result = player;
+        }
+
+        return result;
+    }
 }

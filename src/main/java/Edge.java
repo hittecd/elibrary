@@ -31,6 +31,7 @@ public class Edge {
         if(this.playerId == UNOWNED_ID && !hasRoad) {
             this.playerId = playerId;
             hasRoad = true;
+            success = true;
         }
 
         return success;
