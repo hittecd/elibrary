@@ -166,7 +166,8 @@ public class GameUI extends JPanel {
         private int[] XCenters;
         private int[] YCenters;
 
-        private Font font = new Font("Arial", Font.BOLD, 18);
+        private Font font1 = new Font("Arial", Font.BOLD, 25);
+        private Font font2 = new Font("Arial", Font.BOLD, 18);
         FontMetrics metrics;
 
         public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
@@ -233,7 +234,7 @@ public class GameUI extends JPanel {
             Point origin = new Point(WIDTH / 2, HEIGHT / 2);
 
             g2d.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
-            g2d.setFont(font);
+            g2d.setFont(font1);
             metrics = g.getFontMetrics();
 
             drawCircle(g2d, origin, 390, true, true, 0x4488FF, 0);
@@ -308,7 +309,7 @@ public class GameUI extends JPanel {
                 }
                 int w = metrics.stringWidth(text);
                 int h = metrics.getHeight();
-                g2d.drawString(text, XCenters[i]+origin.x-w/2, YCenters[i]+origin.y+h/2);
+                g2d.drawString(text, XCenters[i]+origin.x-w/2, YCenters[i]+origin.y+h/2-5);
             }
 
             Color color;
@@ -337,29 +338,89 @@ public class GameUI extends JPanel {
                 c = cornerList.get(i);
                 playerId = c.getPlayerId();
 
-                if(playerId >= 0)
+                if(playerId >= 0) {
                     color = playerColorMap.get(playerId);
+                }
                 else
                     color = defaultColor;
 
                 g2d.setColor(color);
                 g2d.fill(Corner2D[i]);
+
+                if(c.hasCity()) {
+                    g2d.setColor(new Color(0x000000));
+                    String text = "C";
+                    int w = metrics.stringWidth(text);
+                    int h = metrics.getHeight();
+                    g2d.drawString(text, XPoints[i] + origin.x - w / 2, YPoints[i] + origin.y + h / 3);
+                }
             }
 
             //g2d.setColor(new Color(0x4488FF));
             //g2d.fillRect(0,0, 100, 120);
-            defaultColor = new Color(0x000000);
+            g2d.setFont(font2);
+            metrics = g2d.getFontMetrics();
+            Color blackColor = new Color(0x000000);
             int i = 0;
             for (ResourceType ColorKey: resourceTypeColorMap.keySet()){
                 g2d.setColor(resourceTypeColorMap.get(ColorKey));
-                g2d.fillRect(5, (20*i) + 5, 10, 10);
-                g2d.setColor(defaultColor);
+                g2d.fillRect(5, (30*i) + 5, 20, 20);
+                g2d.setColor(blackColor);
                 String text = ColorKey.name().toLowerCase();
+                text = text.substring(0,1).toUpperCase() + text.substring(1);
                 int w = metrics.stringWidth(text);
                 int h = metrics.getHeight();
-                g2d.drawString(text,20,(20*i) + 5 + h/2);
+                g2d.drawString(text,30,(30*i) + 5 + h-6);
                 i += 1;
             }
+            for(i =0; i < 4; i++){
+                String text = "Player " + i;
+                int w = metrics.stringWidth(text);
+                int h = metrics.getHeight();
+                g2d.setColor(playerColorMap.get(i));
+                g2d.fillRect(WIDTH - w - 30, 5 + (30*i), 20,20);
+                g2d.setColor(blackColor);
+                g2d.drawString(text,WIDTH - w - 5,(30*i) + 5 + h-6);
+            }
+            //String[] buildKey = {"3 Ore, 2 Wheat", "City", "1 Lumber, 1 Brick", "1 Wheat, 1 Sheep",
+            //        "Settlement", "1 Lumber, 1 Brick", "Road"};
+            String[] buildKey = {"Development Card", "City","Settlement","Road"};
+            int h = metrics.getHeight();
+            g2d.setColor(blackColor);
+            for(i = 0; i < buildKey.length; i++){
+                String text = buildKey[i];
+                g2d.drawString(text, 5, HEIGHT - 5 - (25*(i+1)) - h/2 + 5 - (h*i));
+            }
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.ORE));
+            for(i = 0; i < 3; i++) {
+                g2d.fillRect((5 * (i + 1)) + (20 * i), HEIGHT - 55 - h, 20, 20);
+            }
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.WHEAT));
+            for(i = 3; i < 5; i++){
+                g2d.fillRect((5 * (i + 1)) + (20 * i), HEIGHT - 55 - h, 20, 20);
+            }
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.WHEAT));
+            g2d.fillRect(5, HEIGHT - 80 - h*2, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.SHEEP));
+            g2d.fillRect(30, HEIGHT - 80 - h*2, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.LUMBER));
+            g2d.fillRect(55, HEIGHT - 80 - h*2, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.BRICK));
+            g2d.fillRect(80, HEIGHT - 80 - h*2, 20, 20);
+
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.LUMBER));
+            g2d.fillRect(5, HEIGHT - 105 - h*3, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.BRICK));
+            g2d.fillRect(30, HEIGHT - 105 - h*3, 20, 20);
+
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.ORE));
+            g2d.fillRect(55, HEIGHT - 25, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.WHEAT));
+            g2d.fillRect(5, HEIGHT - 25, 20, 20);
+            g2d.setColor(resourceTypeColorMap.get(ResourceType.SHEEP));
+            g2d.fillRect(30, HEIGHT - 25, 20, 20);
+
+
 
         }
 
