@@ -332,6 +332,8 @@ public class GameUI extends JPanel {
             }
 
             // draw corners
+            g2d.setFont(font2);
+            metrics = g2d.getFontMetrics();
             Corner c;
             defaultColor = new Color(0xFFFFFF);
             for(int i = 0; i < 54; i++){
@@ -352,14 +354,10 @@ public class GameUI extends JPanel {
                     String text = "C";
                     int w = metrics.stringWidth(text);
                     int h = metrics.getHeight();
-                    g2d.drawString(text, XPoints[i] + origin.x - w / 2, YPoints[i] + origin.y + h / 3);
+                    g2d.drawString(text, XPoints[i] + origin.x - w / 2, YPoints[i] + origin.y + h/3);
                 }
             }
 
-            //g2d.setColor(new Color(0x4488FF));
-            //g2d.fillRect(0,0, 100, 120);
-            g2d.setFont(font2);
-            metrics = g2d.getFontMetrics();
             Color blackColor = new Color(0x000000);
             int i = 0;
             for (ResourceType ColorKey: resourceTypeColorMap.keySet()){
@@ -382,8 +380,7 @@ public class GameUI extends JPanel {
                 g2d.setColor(blackColor);
                 g2d.drawString(text,WIDTH - w - 5,(30*i) + 5 + h-6);
             }
-            //String[] buildKey = {"3 Ore, 2 Wheat", "City", "1 Lumber, 1 Brick", "1 Wheat, 1 Sheep",
-            //        "Settlement", "1 Lumber, 1 Brick", "Road"};
+
             String[] buildKey = {"Development Card", "City","Settlement","Road"};
             int h = metrics.getHeight();
             g2d.setColor(blackColor);
