@@ -17,6 +17,10 @@ public class Corner {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public int getPlayerId() {
         return playerId;
     }
@@ -26,31 +30,57 @@ public class Corner {
         this.edges.addAll(edges);
     }
 
-    public boolean buildSettlement(int playerId) {
-        boolean success = false;
+    public List<Edge> getEdges() {
+        return new ArrayList(edges);
+    }
 
-        if(this.playerId == UNOWNED_ID && !hasSettlement) {
-            this.playerId = playerId;
-            hasSettlement = true;
-            success = true;
+    public boolean buildSettlement(int playerId, boolean inSetupPhase) {
+
+        // check ownership
+        if(this.playerId != UNOWNED_ID || hasSettlement)
+            return false;
+
+        // check connected to road if not currently in setup phase
+        if(!inSetupPhase) {
+            boolean onRoad = false;
+
+            for (Edge e : edges) {
+                if(e.getPlayerId() == playerId) {
+                    onRoad = true;
+                    break;
+                }
+            }
+
+            if(!onRoad)
+                return false;
         }
 
-        return success;
+        // check distance from other cities
+        for(Edge e : edges) {
+            for(Corner c : e.getCorners()) {
+                if(c.getId() != this.id && c.getPlayerId() != UNOWNED_ID)
+                    return false;
+            }
+        }
+
+        this.playerId = playerId;
+        hasSettlement = true;
+
+        return true;
     }
 
     public boolean hasSettlement() {
         return hasSettlement;
     }
 
-    private boolean buildCity(int playerId) {
-        boolean success = false;
-
-        if(this.playerId == playerId && hasSettlement) {
+    public boolean buildCity(int playerId) {
+        if(this.playerId == playerId && hasSettlement()) {
             hasCity = true;
-            success = true;
+            hasSettlement = false;
+            return true;
         }
 
-        return success;
+        return false;
     }
 
     public boolean hasCity() {

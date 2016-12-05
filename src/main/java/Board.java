@@ -48,11 +48,11 @@ public class Board {
         return result;
     }
 
-    public MoveResult buildSettlement(Player player, int cornerId) {
+    public MoveResult buildSettlement(Player player, int cornerId, boolean inSetupPhase) {
         MoveResult result;
         Corner c = cornerIndex.get(cornerId);
 
-        if(c.buildSettlement(player.getPlayerId())) {
+        if(c.buildSettlement(player.getPlayerId(), inSetupPhase)) {
             result = new MoveResult(true, "");
             player.addCorner(c);
         }
@@ -63,7 +63,15 @@ public class Board {
     }
 
     public MoveResult buildCity(Player player, int cornerId) {
-        return null;
+        MoveResult result;
+        Corner c = cornerIndex.get(cornerId);
+
+        if(c.buildCity(player.getPlayerId()))
+            result = new MoveResult(true, "");
+        else
+            result = new MoveResult(false, "Failed to build City. Check your placement and try again.");
+
+        return result;
     }
 
     public MoveResult placeRobber(Player player, int hexId) {

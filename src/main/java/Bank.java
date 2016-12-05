@@ -146,7 +146,7 @@ public class Bank {
         }
     }
 
-    public void addResourceCards(Hashtable<ResourceType, Integer> newCards) {
+    public void addResourceCards(Map<ResourceType, Integer> newCards) {
         int currentCount;
         int newCount;
 

@@ -16,6 +16,10 @@ public class Edge {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public int getPlayerId() {
         return playerId;
     }
@@ -25,16 +29,36 @@ public class Edge {
         this.corners.addAll(corners);
     }
 
-    public boolean buildRoad(int playerId) {
-        boolean success = false;
+    public List<Corner> getCorners() {
+        return new ArrayList<Corner>(corners);
+    }
 
-        if(this.playerId == UNOWNED_ID && !hasRoad) {
-            this.playerId = playerId;
-            hasRoad = true;
-            success = true;
+    public boolean buildRoad(int playerId) {
+        // check ownership
+        if(this.playerId != UNOWNED_ID || hasRoad)
+            return false;
+
+        // check connection to settlement
+        for(Corner c : corners) {
+            if(c.getPlayerId() == playerId) {
+                this.playerId = playerId;
+                hasRoad = true;
+                return true;
+            }
         }
 
-        return success;
+        //check connection to road
+        for(Corner c : corners) {
+            for(Edge e : c.getEdges()) {
+                if(e.getId() != this.id && e.getPlayerId() == playerId) {
+                    this.playerId = playerId;
+                    hasRoad = true;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

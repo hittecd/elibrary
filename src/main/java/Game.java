@@ -6,12 +6,6 @@ public class Game {
 
     public interface GameListener {};
 
-    private GameListener gameListener;
-
-    public void setGameListener(GameListener gameListener) {
-        this.gameListener = gameListener;
-    }
-
     public interface UpdateStateListener {
         void updateState(GameState newState);
     }
@@ -20,10 +14,6 @@ public class Game {
 
     public void registerUpdateStateListener(UpdateStateListener updateStateListener) {
         updateStateListenersList.add(updateStateListener);
-    }
-
-    public void unregisterUpdateStateListener(UpdateStateListener updateStateListener) {
-        updateStateListenersList.remove(updateStateListener);
     }
 
     public void updateState(GameState newState) {
@@ -210,12 +200,14 @@ public class Game {
                 result = setupBoardManager.setupCorner(cornerId);
             }
             else if(gameState == GameState.BUILD_SETTLEMENT) {
-                result = board.buildSettlement(currentPlayer, cornerId);
+                result = board.buildSettlement(currentPlayer, cornerId, false);
                 if(result.isSuccess())
                     updateState(GameState.TURN_STARTED);
             }
             else if(gameState == GameState.BUILD_CITY) {
                 result = board.buildCity(currentPlayer, cornerId);
+                if(result.isSuccess())
+                    updateState(GameState.TURN_STARTED);
             }
             else
                 result = new MoveResult(false, "Cannot build Settlement/City at this time.");
@@ -285,10 +277,6 @@ public class Game {
 
         playerManager = new PlayerManager(numPlayers);
 
-        List<Hex> hexList = board.getHexList();
-        List<Edge> edgeList = board.getEdgeList();
-        List<Corner> cornerList = board.getCornerList();
-
         gameUI = new GameUI(this);
         gameUI.setBoardPanelListener(boardPanelListener);
         gameUI.setControlPanelListener(controlPanelListener);
@@ -337,13 +325,12 @@ public class Game {
         private MoveResult setupCorner(int cornerId) {
             MoveResult result;
             SetupStage stage = setupStages.get(setupStageIndex);
-            //Player player = playerManager.getPlayerById(stage.playerId);
             Player player = playerManager.getCurrentPlayer();
 
             if(stage.gameState != GameState.BUILD_SETTLEMENT)
                 result = new MoveResult(false, "Select Edge to build Road.");
             else
-                result = board.buildSettlement(player, cornerId);
+                result = board.buildSettlement(player, cornerId, true);
 
             if(result.isSuccess())
                 setupStageIndex++;
@@ -362,7 +349,6 @@ public class Game {
         private MoveResult setupEdge(int edgeId) {
             MoveResult result;
             SetupStage stage = setupStages.get(setupStageIndex);
-            //Player player = playerManager.getPlayerById(stage.playerId);
             Player player = playerManager.getCurrentPlayer();
 
             if(stage.gameState != GameState.BUILD_ROAD)
