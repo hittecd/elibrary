@@ -48,6 +48,10 @@ public class PlayerManager {
         return result;
     }
 
+    public void setPlayerById(int playerId) {
+        currentPlayer = playersList.get(playerId);
+    }
+
     public Map<Player, Map<ResourceType, Integer>> resolveResources(List<Hex> hexList) {
         Map<Player, Map<ResourceType, Integer>> result = new HashMap();
         Map<ResourceType, Integer> resourceMap;

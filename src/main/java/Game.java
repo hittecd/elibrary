@@ -337,7 +337,8 @@ public class Game {
         private MoveResult setupCorner(int cornerId) {
             MoveResult result;
             SetupStage stage = setupStages.get(setupStageIndex);
-            Player player = playerManager.getPlayerById(stage.playerId);
+            //Player player = playerManager.getPlayerById(stage.playerId);
+            Player player = playerManager.getCurrentPlayer();
 
             if(stage.gameState != GameState.BUILD_SETTLEMENT)
                 result = new MoveResult(false, "Select Edge to build Road.");
@@ -349,6 +350,11 @@ public class Game {
 
             if(setupStageIndex == (numPlayers*4))
                 updateState(GameState.START_TURN);
+            else {
+                SetupStage nextStage = setupStages.get(setupStageIndex);
+                playerManager.setPlayerById(nextStage.playerId);
+                updateState(GameState.SETUP_BOARD);
+            }
 
             return result;
         }
@@ -356,7 +362,8 @@ public class Game {
         private MoveResult setupEdge(int edgeId) {
             MoveResult result;
             SetupStage stage = setupStages.get(setupStageIndex);
-            Player player = playerManager.getPlayerById(stage.playerId);
+            //Player player = playerManager.getPlayerById(stage.playerId);
+            Player player = playerManager.getCurrentPlayer();
 
             if(stage.gameState != GameState.BUILD_ROAD)
                 result = new MoveResult(false, "Select Corner to build Settlement");
@@ -368,6 +375,11 @@ public class Game {
 
             if(setupStageIndex == (numPlayers*4))
                 updateState(GameState.START_TURN);
+            else {
+                SetupStage nextStage = setupStages.get(setupStageIndex);
+                playerManager.setPlayerById(nextStage.playerId);
+                updateState(GameState.SETUP_BOARD);
+            }
 
             return result;
         }
