@@ -29,13 +29,12 @@ public class Player {
         return victoryPoints;
     }
 
-    //TODO: change the resource counts back to 0
     private void initResourceCards() {
-        resourceCards.put(ResourceType.SHEEP, 10);
-        resourceCards.put(ResourceType.WHEAT, 10);
-        resourceCards.put(ResourceType.ORE, 10);
-        resourceCards.put(ResourceType.LUMBER, 10);
-        resourceCards.put(ResourceType.BRICK, 10);
+        resourceCards.put(ResourceType.SHEEP, 0);
+        resourceCards.put(ResourceType.WHEAT, 0);
+        resourceCards.put(ResourceType.ORE, 0);
+        resourceCards.put(ResourceType.LUMBER, 0);
+        resourceCards.put(ResourceType.BRICK, 0);
     }
 
     public Map<ResourceType, Integer> getResourceCards() {
