@@ -30,11 +30,11 @@ public class Player {
     }
 
     private void initResourceCards() {
-        resourceCards.put(ResourceType.SHEEP, 10);
-        resourceCards.put(ResourceType.WHEAT, 10);
-        resourceCards.put(ResourceType.ORE, 10);
-        resourceCards.put(ResourceType.LUMBER, 10);
-        resourceCards.put(ResourceType.BRICK, 10);
+        resourceCards.put(ResourceType.SHEEP, 0);
+        resourceCards.put(ResourceType.WHEAT, 0);
+        resourceCards.put(ResourceType.ORE, 0);
+        resourceCards.put(ResourceType.LUMBER, 0);
+        resourceCards.put(ResourceType.BRICK, 0);
     }
 
     private void initDevelopmentCards() {
