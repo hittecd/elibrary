@@ -91,6 +91,7 @@ public class Game {
                 bank.allocateResourceCards(settlementCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_SETTLEMENT);
+                p.addVictoryPointSettlement();
             }
 
             return result;
@@ -123,6 +124,7 @@ public class Game {
                 bank.allocateResourceCards(cityCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_CITY);
+                p.addVictoryPointCity();
             }
 
             return result;

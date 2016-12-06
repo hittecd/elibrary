@@ -30,11 +30,11 @@ public class Player {
     }
 
     private void initResourceCards() {
-        resourceCards.put(ResourceType.SHEEP, 0);
-        resourceCards.put(ResourceType.WHEAT, 0);
-        resourceCards.put(ResourceType.ORE, 0);
-        resourceCards.put(ResourceType.LUMBER, 0);
-        resourceCards.put(ResourceType.BRICK, 0);
+        resourceCards.put(ResourceType.SHEEP, 10);
+        resourceCards.put(ResourceType.WHEAT, 10);
+        resourceCards.put(ResourceType.ORE, 10);
+        resourceCards.put(ResourceType.LUMBER, 10);
+        resourceCards.put(ResourceType.BRICK, 10);
     }
 
     public Map<ResourceType, Integer> getResourceCards() {
@@ -106,4 +106,19 @@ public class Player {
     public void addCorner(Corner c) {
         cornersList.add(c);
     }
+
+    public void addVictoryPointSettlement(){
+        this.victoryPoints ++;
+        System.out.println("player " + playerId + " get 1 points and " + getVictoryPoints() + " in total\n" );
+
+    }
+
+
+    public void addVictoryPointCity(){
+        this.victoryPoints ++;
+        this.victoryPoints ++;
+        System.out.println("player " + playerId + " get 2 points and " + getVictoryPoints() + " in total\n" );
+
+    }
+
 }
