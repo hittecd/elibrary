@@ -16,11 +16,17 @@ public class GameUI extends JPanel {
     private final JPanel leftPane = new JPanel();
     private final JPanel rightPane = new JPanel();
 
+
     private final ResourcePanel resourcePanel = new ResourcePanel();
+    private final DevCardPanel devCardPanel = new DevCardPanel();
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPanel = new BoardPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
+
+    public void setControlPanel(Integer vp){
+        controlPanel.victoryPointLabel.setText("Victory Points: " + vp);
+    }
 
     /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
@@ -33,6 +39,7 @@ public class GameUI extends JPanel {
     private BoardPanelListener boardPanelListener;
     private ControlPanelListener controlPanelListener;
     private ResourcePanelListener resourcePanelListener;
+    private DevCardPanelListener devCardPanelListener;
 
     //private GameState gameState;
 
@@ -44,6 +51,7 @@ public class GameUI extends JPanel {
         game.registerUpdateStateListener(boardPanel.getUpdateStateListener());
         game.registerUpdateStateListener(resourcePanel.getUpdateStateListener());
         game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(devCardPanel.getUpdateStateListener());
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
         leftPane.add(boardPanel);
@@ -51,6 +59,7 @@ public class GameUI extends JPanel {
         rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
         rightPane.add(controlPanel);
         rightPane.add(resourcePanel);
+        rightPane.add(devCardPanel);
 
         this.add(leftPane);
         this.add(rightPane);
@@ -67,6 +76,8 @@ public class GameUI extends JPanel {
     public void setResourcePanelListener(ResourcePanelListener listener) {
         resourcePanelListener = listener;
     }
+
+    public void setDevCardPanelListener(DevCardPanelListener listener){ devCardPanelListener = listener;}
 
     private class BoardPanel extends JPanel implements MouseListener {
         private final int WIDTH = 990;
@@ -526,23 +537,27 @@ public class GameUI extends JPanel {
 
         private final JLabel gameStateLabel = new JLabel("Game State: ");
         private final JLabel currentPlayerLabel = new JLabel("Current Player: ");
+        private final JLabel victoryPointLabel = new JLabel ("Victory Points: ");
 
         private final JButton buyRoadBtn = new JButton("Buy Road");
         private final JButton buySettlementBtn = new JButton("Buy Settlement");
         private final JButton buyCityBtn = new JButton("Buy City");
         private final JButton buyDevelopmentCardBtn = new JButton("Buy Development Card");
-
+        private final JButton cancelBuyBtn = new JButton("Cancel purchase");
         private final JButton playDevelopmentCardBtn = new JButton("Play Development Card");
 
         private final JButton startTurnBtn = new JButton("Start Turn");
         private final JButton endTurnBtn = new JButton("End Turn");
+        private final JButton exitGameBtn = new JButton("Exit Game");
+
 
         private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
             public void updateState(GameState newState) {
                 Player currentPlayer = controlPanelListener.onGetNextPlayer();
                 currentPlayerLabel.setText("Current Player: " + currentPlayer.getPlayerId());
-                gameStateLabel.setText("Game State: " + newState);
 
+                victoryPointLabel.setText("Victory Points: " + currentPlayer.getVictoryPoints());
+                gameStateLabel.setText("Game State: " + newState);
             }
         };
 
@@ -571,6 +586,13 @@ public class GameUI extends JPanel {
                 else if(e.getSource() == endTurnBtn) {
                     result = controlPanelListener.onEndTurn();
                 }
+                else if(e.getSource() == exitGameBtn) {
+                    result = controlPanelListener.onExitGame();
+                    System.exit(0);
+                }
+                else if(e.getSource() == cancelBuyBtn) {
+                    result = controlPanelListener.onCancelBuy();
+                }
                 else
                     result = new MoveResult(false, "Could not handle ActionEvent");
 
@@ -590,17 +612,23 @@ public class GameUI extends JPanel {
             playDevelopmentCardBtn.addActionListener(controlPanelActionListener);
             startTurnBtn.addActionListener(controlPanelActionListener);
             endTurnBtn.addActionListener(controlPanelActionListener);
+            exitGameBtn.addActionListener(controlPanelActionListener);
+            cancelBuyBtn.addActionListener(controlPanelActionListener);
 
             this.add(controlPanelLabel);
             this.add(gameStateLabel);
             this.add(currentPlayerLabel);
+            this.add(victoryPointLabel);
             this.add(buyRoadBtn);
             this.add(buySettlementBtn);
             this.add(buyCityBtn);
             this.add(buyDevelopmentCardBtn);
+            this.add(cancelBuyBtn);
             this.add(playDevelopmentCardBtn);
             this.add(startTurnBtn);
             this.add(endTurnBtn);
+            this.add(exitGameBtn);
+
         }
 
         public Game.UpdateStateListener getUpdateStateListener() {
@@ -627,9 +655,13 @@ public class GameUI extends JPanel {
 
         MoveResult onEndTurn();
 
-        void onExitGame();
+        MoveResult onExitGame();
+
+        MoveResult onCancelBuy();
 
         Player onGetNextPlayer();
+
+
     }
 
     private class ResourcePanel extends JPanel {
@@ -650,6 +682,8 @@ public class GameUI extends JPanel {
                 lumberCountLabel.setText("Lumber: " + resourceMap.get(ResourceType.LUMBER));
                 brickCountLabel.setText("Brick: " + resourceMap.get(ResourceType.BRICK));
                 oreCountLabel.setText("Ore: " + resourceMap.get(ResourceType.ORE));
+
+
             }
         };
 
@@ -672,5 +706,51 @@ public class GameUI extends JPanel {
 
     public interface ResourcePanelListener {
         Map<ResourceType, Integer> onUpdateResourcePanel();
+    }
+
+
+    private class DevCardPanel extends JPanel {
+
+        private final JLabel devCardBoxLabel = new JLabel("Resource Panel");
+        private final JLabel knightLabel = new JLabel();
+        private final JLabel yearOfPlentyLabel = new JLabel();
+        private final JLabel monopolyLabel = new JLabel();
+        private final JLabel roadBuilderLabel = new JLabel();
+        private final JLabel victoryPointLabel = new JLabel();
+
+
+
+        public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+                Map<DevelopmentCard, Integer> devCardMap = devCardPanelListener.onUpdateDevCardPanel();
+
+                knightLabel.setText("KNIGHT: " + devCardMap.get(DevelopmentCard.KNIGHT));
+                yearOfPlentyLabel.setText("YEAR OF PLENTY: " + devCardMap.get(DevelopmentCard.YEAR_OF_PLENTY));
+                monopolyLabel.setText("MONOPOLY: " + devCardMap.get(DevelopmentCard.MONOPOLY));
+                roadBuilderLabel.setText("ROAD BUILDER: " + devCardMap.get(DevelopmentCard.ROAD_BUILDER));
+                victoryPointLabel.setText("VICTORY POINT: " + devCardMap.get(DevelopmentCard.VICTORY_POINT));
+
+            }
+        };
+
+        public DevCardPanel() {
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+            this.add(devCardBoxLabel);
+            this.add(knightLabel);
+            this.add(yearOfPlentyLabel);
+            this.add(monopolyLabel);
+            this.add(roadBuilderLabel);
+            this.add(victoryPointLabel);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return this.updateStateListener;
+        }
+    }
+
+    public interface DevCardPanelListener {
+        Map<DevelopmentCard, Integer> onUpdateDevCardPanel();
     }
 }

@@ -37,8 +37,20 @@ public class Player {
         resourceCards.put(ResourceType.BRICK, 0);
     }
 
+    private void initDevelopmentCards() {
+        developmentCards.put(DevelopmentCard.KNIGHT, 0);
+        developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY, 0);
+        developmentCards.put(DevelopmentCard.ROAD_BUILDER, 0);
+        developmentCards.put(DevelopmentCard.MONOPOLY, 0);
+        developmentCards.put(DevelopmentCard.VICTORY_POINT, 0);
+    }
+
     public Map<ResourceType, Integer> getResourceCards() {
         return new HashMap<ResourceType, Integer>(resourceCards);
+    }
+
+    public Map<DevelopmentCard, Integer> getDevCards() {
+        return new HashMap<DevelopmentCard, Integer>(developmentCards);
     }
 
     public void addResourceCards(Map<ResourceType, Integer> newResourceCards) {
@@ -55,6 +67,25 @@ public class Player {
                 currentCount = new Integer(0);
 
             resourceCards.put(resourceType, currentCount + newCount);
+        }
+    }
+
+    public void addDevelopmentCard(Map<DevelopmentCard, Integer> newDevCards) {
+
+        Integer newCount;
+        Integer currentCount;
+
+        for (DevelopmentCard developmentCard : newDevCards.keySet()) {
+            newCount = newDevCards.get(developmentCard);
+            if (newCount == null)
+                newCount = new Integer(0);
+
+            currentCount = developmentCards.get(developmentCard);
+            if (currentCount == null)
+                currentCount = new Integer(0);
+
+            developmentCards.put(developmentCard, currentCount + newCount);
+
         }
     }
 
@@ -87,13 +118,10 @@ public class Player {
         return success;
     }
 
-    private void initDevelopmentCards() {
-        developmentCards.put(DevelopmentCard.KNIGHT, 0);
-        developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY, 0);
-        developmentCards.put(DevelopmentCard.ROAD_BUILDER, 0);
-        developmentCards.put(DevelopmentCard.MONOPOLY, 0);
-        developmentCards.put(DevelopmentCard.VICTORY_POINT, 0);
-    }
+
+
+
+
 
     public void playDevelopmentCard(DevelopmentCard developmentCard) {}
 
@@ -103,5 +131,19 @@ public class Player {
 
     public void addCorner(Corner c) {
         cornersList.add(c);
+    }
+
+    public void addVictoryPointSettlement(){
+        this.victoryPoints ++;
+        System.out.println("player " + playerId + " get 1 points and " + getVictoryPoints() + " in total\n" );
+
+    }
+
+
+    public void addVictoryPointCity(){
+        this.victoryPoints ++;
+        this.victoryPoints ++;
+        System.out.println("player " + playerId + " get 2 points and " + getVictoryPoints() + " in total\n" );
+
     }
 }
