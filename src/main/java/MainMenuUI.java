@@ -36,17 +36,15 @@ public class MainMenuUI extends JPanel {
     private final ActionListener mainMenuUIActionListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == newGameBtn3)
-                mainMenuUIListener.startNewGame(3);
+                mainMenuUIListener.onNewGame(3);
             else if(e.getSource() == newGameBtn4)
-                mainMenuUIListener.startNewGame(4);
+                mainMenuUIListener.onNewGame(4);
         }
     };
 
     private MainMenuUIListener mainMenuUIListener;
 
-    public MainMenuUI(MainMenuUIListener listener) {
-        setMainMenuUIListener(listener);
-
+    public MainMenuUI() {
         Border blackline = BorderFactory.createLineBorder(Color.BLACK);
 
         //format logo panel
@@ -86,7 +84,7 @@ public class MainMenuUI extends JPanel {
     }
 
     public interface MainMenuUIListener {
-        void startNewGame(int numPlayers);
+        void onNewGame(int numPlayers);
     }
 
 }

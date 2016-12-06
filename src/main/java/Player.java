@@ -95,9 +95,7 @@ public class Player {
         developmentCards.put(DevelopmentCard.VICTORY_POINT, 0);
     }
 
-    private void playDevelopmentCard(DevelopmentCard devCard) {
-
-    }
+    public void playDevelopmentCard(DevelopmentCard developmentCard) {}
 
     public void addEdge(Edge e) {
         edgesList.add(e);

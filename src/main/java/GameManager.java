@@ -5,30 +5,28 @@ import java.awt.event.ActionEvent;
 
 public class GameManager {
 
-    private JFrame mainGameFrameUI;
-    private MainMenuUI mainMenuUI;
+    private final JFrame mainGameFrameUI = new JFrame("Welcome to Settlers of Catan!");;
+    private final MainMenuUI mainMenuUI = new MainMenuUI();
+    private final DatabaseHelper databaseHelper = new DatabaseHelper();
+    private final MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
+        public void onNewGame(int numPlayers) {
+            newGame(numPlayers);
+        }
+    };
+
     private Game currentGame;
-    private DatabaseHelper databaseHelper;
 
     public GameManager() {
-        // TODO: init database helper
-
-        // init main game frame
-        mainGameFrameUI = new JFrame("Welcome to Settlers of Catan!");
-
-        // init main menu ui
-        MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
-            public void startNewGame(int numPlayers) {
-                newGame(numPlayers);
-            }
-        };
-        mainMenuUI = new MainMenuUI(listener); // automatically sets up ui
+        mainMenuUI.setMainMenuUIListener(listener);
 
         mainGameFrameUI.add(mainMenuUI);
-
         mainGameFrameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainGameFrameUI.setExtendedState(JFrame.MAXIMIZED_BOTH); // set ui to full screen
         mainGameFrameUI.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        GameManager gameManager = new GameManager();
     }
 
     private void newGame(int numPlayers) {

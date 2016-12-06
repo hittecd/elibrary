@@ -16,9 +16,9 @@ public class GameUI extends JPanel {
     private final JPanel leftPane = new JPanel();
     private final JPanel rightPane = new JPanel();
 
-    private final ResourcePanel resourcePane = new ResourcePanel();
+    private final ResourcePanel resourcePanel = new ResourcePanel();
     private final ControlPanel controlPanel = new ControlPanel();
-    private final BoardPanel boardPane = new BoardPanel();
+    private final BoardPanel boardPanel = new BoardPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
 
@@ -41,16 +41,16 @@ public class GameUI extends JPanel {
 
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        game.registerUpdateStateListener(boardPane.getUpdateStateListener());
-        game.registerUpdateStateListener(resourcePane.getUpdateStateListener());
+        game.registerUpdateStateListener(boardPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(resourcePanel.getUpdateStateListener());
         game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
-        leftPane.add(boardPane);
+        leftPane.add(boardPanel);
 
         rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
         rightPane.add(controlPanel);
-        rightPane.add(resourcePane);
+        rightPane.add(resourcePanel);
 
         this.add(leftPane);
         this.add(rightPane);
@@ -524,7 +524,7 @@ public class GameUI extends JPanel {
 
         private final JLabel controlPanelLabel = new JLabel("Control Panel");
 
-        private final JLabel gameStateLablel = new JLabel("Game State: ");
+        private final JLabel gameStateLabel = new JLabel("Game State: ");
         private final JLabel currentPlayerLabel = new JLabel("Current Player: ");
 
         private final JButton buyRoadBtn = new JButton("Buy Road");
@@ -541,7 +541,7 @@ public class GameUI extends JPanel {
             public void updateState(GameState newState) {
                 Player currentPlayer = controlPanelListener.onGetNextPlayer();
                 currentPlayerLabel.setText("Current Player: " + currentPlayer.getPlayerId());
-                gameStateLablel.setText("Game State: " + newState);
+                gameStateLabel.setText("Game State: " + newState);
 
             }
         };
@@ -592,7 +592,7 @@ public class GameUI extends JPanel {
             endTurnBtn.addActionListener(controlPanelActionListener);
 
             this.add(controlPanelLabel);
-            this.add(gameStateLablel);
+            this.add(gameStateLabel);
             this.add(currentPlayerLabel);
             this.add(buyRoadBtn);
             this.add(buySettlementBtn);
