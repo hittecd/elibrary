@@ -20,7 +20,13 @@ public class GameUI extends JPanel {
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPane = new BoardPanel();
 
+
+
     private final JOptionPane notificationPane = new JOptionPane();
+
+    public void setControlPanel(Integer vp){
+        controlPanel.victoryPointLabel.setText("Victory Points: " + vp);
+    }
 
     /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {

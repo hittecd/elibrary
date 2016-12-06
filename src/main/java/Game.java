@@ -91,7 +91,7 @@ public class Game {
                 bank.allocateResourceCards(settlementCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_SETTLEMENT);
-                p.addVictoryPointSettlement();
+
             }
 
             return result;
@@ -124,7 +124,7 @@ public class Game {
                 bank.allocateResourceCards(cityCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_CITY);
-                p.addVictoryPointCity();
+
             }
 
             return result;
@@ -203,13 +203,29 @@ public class Game {
             }
             else if(gameState == GameState.BUILD_SETTLEMENT) {
                 result = board.buildSettlement(currentPlayer, cornerId, false);
-                if(result.isSuccess())
+                if(result.isSuccess()) {
                     updateState(GameState.TURN_STARTED);
+                    currentPlayer.addVictoryPointSettlement();
+                    gameUI.setControlPanel(currentPlayer.getVictoryPoints());
+                    if(currentPlayer.getVictoryPoints() >= 5){
+                        updateState(GameState.GAME_WON);
+                        result = new MoveResult(false, "Player " + currentPlayer.getPlayerId() + " Win !");
+
+                    }
+                }
+
             }
             else if(gameState == GameState.BUILD_CITY) {
                 result = board.buildCity(currentPlayer, cornerId);
-                if(result.isSuccess())
+                if(result.isSuccess()) {
                     updateState(GameState.TURN_STARTED);
+                    currentPlayer.addVictoryPointCity();
+                    gameUI.setControlPanel(currentPlayer.getVictoryPoints());
+                    if(currentPlayer.getVictoryPoints() >= 5){
+                        updateState(GameState.GAME_WON);
+                        result = new MoveResult(false, "Player " + currentPlayer.getPlayerId() + " Win !");
+                    }
+                }
             }
             else
                 result = new MoveResult(false, "Cannot build Settlement/City at this time.");
