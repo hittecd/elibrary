@@ -146,6 +146,25 @@ public class Bank {
         }
     }
 
+    public void deAllocateResourceCards(Map<ResourceType, Integer> allocatedCards) {
+        int currentCount;
+        int allocatedCount;
+        int newCount;
+
+        if (allocatedCards == null || allocatedCards.isEmpty())
+            return;
+
+        for (ResourceType resourceType : allocatedCards.keySet()) {
+            if (allocatedCards.get(resourceType) == null)
+                continue;
+
+            allocatedCount = allocatedCards.get(resourceType);
+            currentCount = resourceMap.get(resourceType);
+            newCount = currentCount + allocatedCount;
+            resourceMap.put(resourceType, (newCount >= 0 ? newCount : 0));
+        }
+    }
+
     public void addResourceCards(Map<ResourceType, Integer> newCards) {
         int currentCount;
         int newCount;

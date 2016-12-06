@@ -88,7 +88,7 @@ public class Game {
                 );
             }
             else {
-                bank.allocateResourceCards(settlementCards);
+                bank.deAllocateResourceCards(settlementCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_SETTLEMENT);
 
@@ -121,7 +121,7 @@ public class Game {
                 );
             }
             else {
-                bank.allocateResourceCards(cityCards);
+                bank.deAllocateResourceCards(cityCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_CITY);
 
@@ -185,7 +185,74 @@ public class Game {
             return result;
         }
 
-        public void onExitGame() {}
+        public MoveResult onExitGame() {
+            MoveResult result;
+            result = new MoveResult(true, "");
+            return result;
+        }
+
+        public MoveResult onCancelBuy(){
+            MoveResult result;
+
+            if(gameState != GameState.BUILD_CITY && gameState != GameState.BUILD_ROAD && gameState != GameState.BUILD_SETTLEMENT) {
+                return new MoveResult(false, "You cannot cancel any purchase so far");
+            }
+            else if(gameState == GameState.BUILD_CITY){
+                Map<ResourceType, Integer> cityCards = new HashMap();
+                cityCards.put(ResourceType.ORE, 3);
+                cityCards.put(ResourceType.WHEAT, 2);
+                cityCards.put(ResourceType.SHEEP, 0);
+                cityCards.put(ResourceType.LUMBER, 0);
+                cityCards.put(ResourceType.BRICK, 0);
+
+                Player p = playerManager.getCurrentPlayer();
+
+                // validate player resources
+                p.addResourceCards(cityCards);
+
+                bank.deAllocateResourceCards(cityCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.TURN_STARTED);
+            }
+            else if(gameState == GameState.BUILD_SETTLEMENT){
+                Map<ResourceType, Integer> settlementCards = new HashMap();
+                settlementCards.put(ResourceType.SHEEP, 1);
+                settlementCards.put(ResourceType.WHEAT, 1);
+                settlementCards.put(ResourceType.BRICK, 1);
+                settlementCards.put(ResourceType.LUMBER, 1);
+                settlementCards.put(ResourceType.ORE, 0);
+
+                Player p = playerManager.getCurrentPlayer();
+
+                // validate player resources
+                p.addResourceCards(settlementCards);
+
+                bank.deAllocateResourceCards(settlementCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.TURN_STARTED);
+            }
+            else if(gameState == GameState.BUILD_ROAD){
+                Map<ResourceType, Integer> roadCards = new HashMap();
+                roadCards.put(ResourceType.BRICK, 1);
+                roadCards.put(ResourceType.LUMBER, 1);
+                roadCards.put(ResourceType.WHEAT, 0);
+                roadCards.put(ResourceType.SHEEP, 0);
+                roadCards.put(ResourceType.ORE, 0);
+
+                Player p = playerManager.getCurrentPlayer();
+
+                // validate player resources
+                p.addResourceCards(roadCards);
+
+                bank.deAllocateResourceCards(roadCards);
+                result = new MoveResult(true, "");
+                updateState(GameState.TURN_STARTED);
+            }
+            else
+                result = new MoveResult(true, "");
+
+            return result;
+        }
 
         public Player onGetNextPlayer() {
             return playerManager.getCurrentPlayer();

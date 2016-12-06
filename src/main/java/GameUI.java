@@ -538,11 +538,13 @@ public class GameUI extends JPanel {
         private final JButton buySettlementBtn = new JButton("Buy Settlement");
         private final JButton buyCityBtn = new JButton("Buy City");
         private final JButton buyDevelopmentCardBtn = new JButton("Buy Development Card");
-
+        private final JButton cancelBuyBtn = new JButton("Cancel purchase");
         private final JButton playDevelopmentCardBtn = new JButton("Play Development Card");
 
         private final JButton startTurnBtn = new JButton("Start Turn");
         private final JButton endTurnBtn = new JButton("End Turn");
+        private final JButton exitGameBtn = new JButton("Exit Game");
+
 
         private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
             public void updateState(GameState newState) {
@@ -579,6 +581,13 @@ public class GameUI extends JPanel {
                 else if(e.getSource() == endTurnBtn) {
                     result = controlPanelListener.onEndTurn();
                 }
+                else if(e.getSource() == exitGameBtn) {
+                    result = controlPanelListener.onExitGame();
+                    System.exit(0);
+                }
+                else if(e.getSource() == cancelBuyBtn) {
+                    result = controlPanelListener.onCancelBuy();
+                }
                 else
                     result = new MoveResult(false, "Could not handle ActionEvent");
 
@@ -598,6 +607,8 @@ public class GameUI extends JPanel {
             playDevelopmentCardBtn.addActionListener(controlPanelActionListener);
             startTurnBtn.addActionListener(controlPanelActionListener);
             endTurnBtn.addActionListener(controlPanelActionListener);
+            exitGameBtn.addActionListener(controlPanelActionListener);
+            cancelBuyBtn.addActionListener(controlPanelActionListener);
 
             this.add(controlPanelLabel);
             this.add(gameStateLablel);
@@ -607,9 +618,12 @@ public class GameUI extends JPanel {
             this.add(buySettlementBtn);
             this.add(buyCityBtn);
             this.add(buyDevelopmentCardBtn);
+            this.add(cancelBuyBtn);
             this.add(playDevelopmentCardBtn);
             this.add(startTurnBtn);
             this.add(endTurnBtn);
+            this.add(exitGameBtn);
+
         }
 
         public Game.UpdateStateListener getUpdateStateListener() {
@@ -636,9 +650,13 @@ public class GameUI extends JPanel {
 
         MoveResult onEndTurn();
 
-        void onExitGame();
+        MoveResult onExitGame();
+
+        MoveResult onCancelBuy();
 
         Player onGetNextPlayer();
+
+
     }
 
     private class ResourcePanel extends JPanel {
