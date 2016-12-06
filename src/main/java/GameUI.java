@@ -526,6 +526,7 @@ public class GameUI extends JPanel {
 
         private final JLabel gameStateLablel = new JLabel("Game State: ");
         private final JLabel currentPlayerLabel = new JLabel("Current Player: ");
+        private final JLabel victoryPointLabel = new JLabel ("Victory Points: ");
 
         private final JButton buyRoadBtn = new JButton("Buy Road");
         private final JButton buySettlementBtn = new JButton("Buy Settlement");
@@ -541,6 +542,7 @@ public class GameUI extends JPanel {
             public void updateState(GameState newState) {
                 Player currentPlayer = controlPanelListener.onGetNextPlayer();
                 currentPlayerLabel.setText("Current Player: " + currentPlayer.getPlayerId());
+                victoryPointLabel.setText("Victory Points: " + currentPlayer.getVictoryPoints());
                 gameStateLablel.setText("Game State: " + newState);
 
             }
@@ -594,6 +596,7 @@ public class GameUI extends JPanel {
             this.add(controlPanelLabel);
             this.add(gameStateLablel);
             this.add(currentPlayerLabel);
+            this.add(victoryPointLabel);
             this.add(buyRoadBtn);
             this.add(buySettlementBtn);
             this.add(buyCityBtn);
