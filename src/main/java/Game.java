@@ -131,7 +131,43 @@ public class Game {
         }
 
         public MoveResult onBuyDevCard() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
+            MoveResult result;
+
+            if(gameState != GameState.TURN_STARTED)
+                return new MoveResult(false, "You cannot buy development card at this time");
+
+            Map<ResourceType, Integer> devCards = new HashMap();
+            devCards.put(ResourceType.ORE, 1);
+            devCards.put(ResourceType.SHEEP, 1);
+            devCards.put(ResourceType.WHEAT, 1);
+            devCards.put(ResourceType.LUMBER, 0);
+            devCards.put(ResourceType.BRICK, 0);
+
+            Player p = playerManager.getCurrentPlayer();
+
+            Map<DevelopmentCard, Integer> devCardList = new HashMap();
+
+            // validate player resources
+            if(!p.spendResourceCards(devCards)) {
+                result = new MoveResult(false,
+                        "Player does not have required resources for a development card:\n" +
+                                "\t1 - ORE\n" +
+                                "\t1 - WHEAT\n" +
+                                "\t1 - SHEEP\n"
+                );
+            }
+            else {
+                bank.deAllocateResourceCards(devCards);
+
+                DevelopmentCard dc = bank.getDevelopmentCard();
+                devCardList.put(dc,1);
+                p.addDevelopmentCard(devCardList);
+
+                result = new MoveResult(true, "");
+                updateState(GameState.TURN_STARTED);
+            }
+
+            return result;
         }
 
         public MoveResult onPlayDevCard() {
@@ -353,6 +389,13 @@ public class Game {
         }
     };
 
+    private final GameUI.DevCardPanelListener devCardPanelListener = new GameUI.DevCardPanelListener() {
+        public Map<DevelopmentCard, Integer> onUpdateDevCardPanel() {
+            Player currentPlayer = playerManager.getCurrentPlayer();
+            return currentPlayer.getDevCards();
+        }
+    };
+
     private GameState gameState;
     private int rollVal;
 
@@ -366,6 +409,7 @@ public class Game {
         gameUI.setBoardPanelListener(boardPanelListener);
         gameUI.setControlPanelListener(controlPanelListener);
         gameUI.setResourcePanelListener(resourcePanelLister);
+        gameUI.setDevCardPanelListener(devCardPanelListener);
 
         updateState(GameState.SETUP_BOARD);
     }
