@@ -561,7 +561,7 @@ public class GameUI extends JPanel {
 
         private final ActionListener controlPanelActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MoveResult result;
+                MoveResult result = null;
 
                 if(e.getSource() == buyRoadBtn) {
                     result = controlPanelListener.onBuyRoad();
@@ -585,8 +585,7 @@ public class GameUI extends JPanel {
                     result = controlPanelListener.onEndTurn();
                 }
                 else if(e.getSource() == exitGameBtn) {
-                    result = controlPanelListener.onExitGame();
-                    System.exit(0);
+                    controlPanelListener.onExitGame();
                 }
                 else if(e.getSource() == cancelBuyBtn) {
                     result = controlPanelListener.onCancelBuy();
@@ -594,7 +593,7 @@ public class GameUI extends JPanel {
                 else
                     result = new MoveResult(false, "Could not handle ActionEvent");
 
-                if (result.getMessage() != null && !result.getMessage().isEmpty())
+                if (result != null && (result.getMessage() != null && !result.getMessage().isEmpty()))
                     notificationPane.showMessageDialog(null, result.getMessage());
             }
         };
@@ -653,7 +652,7 @@ public class GameUI extends JPanel {
 
         MoveResult onEndTurn();
 
-        MoveResult onExitGame();
+        void onExitGame();
 
         MoveResult onCancelBuy();
 

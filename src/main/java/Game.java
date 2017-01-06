@@ -3,7 +3,9 @@ import java.util.*;
 
 public class Game {
 
-    public interface GameListener {}
+    public interface GameListener {
+        void onExitGame();
+    }
 
     public interface UpdateStateListener {
         void updateState(GameState newState);
@@ -21,6 +23,8 @@ public class Game {
         for(UpdateStateListener listener : updateStateListenersList)
             listener.updateState(newState);
     }
+
+    private final GameListener gameListener;
 
     private final int numPlayers;
     private final SetupBoardManager setupBoardManager;
@@ -169,63 +173,6 @@ public class Game {
             return result;
         }
 
-        public MoveResult onPlayDevCard() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
-        }
-
-        public MoveResult onTradePlayers() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
-        }
-
-        public MoveResult onTradeBank() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
-        }
-
-        public MoveResult onStartTurn() {
-            MoveResult result;
-
-            if(gameState != GameState.START_TURN) {
-                result = new MoveResult(false, "Cannot Start Turn at this time");
-            }
-            else {
-                rollVal = rollDice();
-
-                List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
-                Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
-
-                for (Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
-                    bank.allocateResourceCards(resourceMap);
-
-                updateState(GameState.TURN_STARTED);
-
-                result = new MoveResult(true, "A " + rollVal + " was rolled!");
-            }
-
-            return result;
-        }
-
-        public MoveResult onEndTurn() {
-            MoveResult result;
-
-            if(gameState != GameState.TURN_STARTED)
-                result = new MoveResult(false, "Cannot End Turn at this time");
-            else {
-                playerManager.updateCurrentPlayer();
-
-                updateState(GameState.START_TURN);
-
-                result = new MoveResult(true, "");
-            }
-
-            return result;
-        }
-
-        public MoveResult onExitGame() {
-            MoveResult result;
-            result = new MoveResult(true, "");
-            return result;
-        }
-
         public MoveResult onCancelBuy(){
             MoveResult result;
 
@@ -287,6 +234,61 @@ public class Game {
                 result = new MoveResult(true, "");
 
             return result;
+        }
+
+        public MoveResult onPlayDevCard() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onTradePlayers() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onTradeBank() {
+            return new MoveResult(false, "NOT IMPLEMENTED");
+        }
+
+        public MoveResult onStartTurn() {
+            MoveResult result;
+
+            if(gameState != GameState.START_TURN) {
+                result = new MoveResult(false, "Cannot Start Turn at this time");
+            }
+            else {
+                rollVal = rollDice();
+
+                List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
+                Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
+
+                for (Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
+                    bank.allocateResourceCards(resourceMap);
+
+                updateState(GameState.TURN_STARTED);
+
+                result = new MoveResult(true, "A " + rollVal + " was rolled!");
+            }
+
+            return result;
+        }
+
+        public MoveResult onEndTurn() {
+            MoveResult result;
+
+            if(gameState != GameState.TURN_STARTED)
+                result = new MoveResult(false, "Cannot End Turn at this time");
+            else {
+                playerManager.updateCurrentPlayer();
+
+                updateState(GameState.START_TURN);
+
+                result = new MoveResult(true, "");
+            }
+
+            return result;
+        }
+
+        public void onExitGame() {
+            gameListener.onExitGame();
         }
 
         public Player onGetNextPlayer() {
@@ -391,8 +393,10 @@ public class Game {
     private GameState gameState;
     private int rollVal;
 
-    public Game(int numPlayers) {
+    public Game(int numPlayers, GameListener gameListener) {
         this.numPlayers = numPlayers;
+        this.gameListener = gameListener;
+
         setupBoardManager = new SetupBoardManager();
 
         playerManager = new PlayerManager(numPlayers);

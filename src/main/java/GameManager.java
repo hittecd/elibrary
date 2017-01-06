@@ -1,6 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 
 
 public class GameManager {
@@ -8,7 +6,7 @@ public class GameManager {
     private final JFrame mainGameFrameUI = new JFrame("Welcome to Settlers of Catan!");;
     private final MainMenuUI mainMenuUI = new MainMenuUI();
     private final DatabaseHelper databaseHelper = new DatabaseHelper();
-    private final MainMenuUI.MainMenuUIListener listener = new MainMenuUI.MainMenuUIListener() {
+    private final MainMenuUI.MainMenuUIListener mainMenuUIListener = new MainMenuUI.MainMenuUIListener() {
         public void onNewGame(int numPlayers) {
             newGame(numPlayers);
         }
@@ -17,12 +15,25 @@ public class GameManager {
             quitSoC();
         }
     };
+    private final Game.GameListener gameListener = new Game.GameListener() {
+        public void onExitGame() {
+            mainGameFrameUI.remove(currentGame.getGameUI());
+
+            mainGameFrameUI.setContentPane(mainMenuUI);
+            mainGameFrameUI.pack();
+            mainGameFrameUI.setLocationRelativeTo(null);
+            mainGameFrameUI.revalidate();
+            mainGameFrameUI.repaint();
+        }
+    };
 
     private Game currentGame;
 
     public GameManager() {
-        mainMenuUI.setMainMenuUIListener(listener);
+        mainMenuUI.setMainMenuUIListener(mainMenuUIListener);
+    }
 
+    private void start() {
         mainGameFrameUI.add(mainMenuUI);
         mainGameFrameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainGameFrameUI.setExtendedState(JFrame.MAXIMIZED_BOTH); // set ui to full screen
@@ -31,12 +42,13 @@ public class GameManager {
 
     public static void main(String[] args) {
         GameManager gameManager = new GameManager();
+        gameManager.start();
     }
 
     private void newGame(int numPlayers) {
         System.out.println("CREATING NEW GAME: " + numPlayers);
 
-        currentGame = new Game(numPlayers);
+        currentGame = new Game(numPlayers, gameListener);
 
         mainGameFrameUI.remove(mainMenuUI);
 
