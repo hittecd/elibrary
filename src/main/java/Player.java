@@ -118,11 +118,6 @@ public class Player {
         return success;
     }
 
-
-
-
-
-
     public void playDevelopmentCard(DevelopmentCard developmentCard) {}
 
     public void addEdge(Edge e) {
@@ -133,17 +128,7 @@ public class Player {
         cornersList.add(c);
     }
 
-    public void addVictoryPointSettlement(){
-        this.victoryPoints ++;
-        System.out.println("player " + playerId + " get 1 points and " + getVictoryPoints() + " in total\n" );
-
-    }
-
-
-    public void addVictoryPointCity(){
-        this.victoryPoints ++;
-        this.victoryPoints ++;
-        System.out.println("player " + playerId + " get 2 points and " + getVictoryPoints() + " in total\n" );
-
+    public void incrementVictoryPoints() {
+        victoryPoints++;
     }
 }

@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Game {
 
-    public interface GameListener {};
+    public interface GameListener {}
 
     public interface UpdateStateListener {
         void updateState(GameState newState);
@@ -294,6 +294,7 @@ public class Game {
             return playerManager.getCurrentPlayer();
         }
     };
+
     private final GameUI.BoardPanelListener boardPanelListener = new GameUI.BoardPanelListener() {
         public MoveResult onCornerClick(int cornerId) {
             System.out.println("CORNER DETECTED IN GAME: " + cornerId);
@@ -302,36 +303,28 @@ public class Game {
             Player currentPlayer = playerManager.getCurrentPlayer();
 
             if(gameState == GameState.SETUP_BOARD) {
-                result = setupBoardManager.setupCorner(cornerId);
+                return setupBoardManager.setupCorner(cornerId);
             }
             else if(gameState == GameState.BUILD_SETTLEMENT) {
                 result = board.buildSettlement(currentPlayer, cornerId, false);
-                if(result.isSuccess()) {
-                    updateState(GameState.TURN_STARTED);
-                    currentPlayer.addVictoryPointSettlement();
-                    gameUI.setControlPanel(currentPlayer.getVictoryPoints());
-                    if(currentPlayer.getVictoryPoints() >= 5){
-                        updateState(GameState.GAME_WON);
-                        result = new MoveResult(false, "Player " + currentPlayer.getPlayerId() + " Win !");
-
-                    }
-                }
-
             }
             else if(gameState == GameState.BUILD_CITY) {
                 result = board.buildCity(currentPlayer, cornerId);
-                if(result.isSuccess()) {
-                    updateState(GameState.TURN_STARTED);
-                    currentPlayer.addVictoryPointCity();
-                    gameUI.setControlPanel(currentPlayer.getVictoryPoints());
-                    if(currentPlayer.getVictoryPoints() >= 5){
-                        updateState(GameState.GAME_WON);
-                        result = new MoveResult(false, "Player " + currentPlayer.getPlayerId() + " Win !");
-                    }
-                }
             }
-            else
+            else {
                 result = new MoveResult(false, "Cannot build Settlement/City at this time.");
+            }
+
+            if(result.isSuccess()) {
+                currentPlayer.incrementVictoryPoints();
+
+                if(currentPlayer.getVictoryPoints() >= 10) {
+                    updateState(GameState.GAME_WON);
+                    gameUI.setControlPanel(currentPlayer.getVictoryPoints());
+                }
+                else
+                    updateState(GameState.TURN_STARTED);
+            }
 
             return result;
         }
@@ -461,8 +454,14 @@ public class Game {
             else
                 result = board.buildSettlement(player, cornerId, true);
 
-            if(result.isSuccess())
+            if(result.isSuccess()) {
+                player.incrementVictoryPoints();
+
+                if(setupStageIndex >= ((numPlayers*4)/2))
+                    assignStartingResourceCards(cornerId);
+
                 setupStageIndex++;
+            }
 
             if(setupStageIndex == (numPlayers*4))
                 updateState(GameState.START_TURN);
@@ -473,6 +472,31 @@ public class Game {
             }
 
             return result;
+        }
+
+        private void assignStartingResourceCards(int cornerId) {
+            Player currentPlayer = playerManager.getCurrentPlayer();
+            Map<ResourceType, Integer> initialResourceCards = currentPlayer.getResourceCards();
+
+            ResourceType currentResourceType;
+            int currentResourceCount;
+
+            List<Hex> hexList = board.getHexList();
+            List<Corner> cornerList;
+
+            for(Hex hex : hexList) {
+                cornerList = hex.getCorners();
+
+                for(Corner corner : cornerList) {
+                    if(corner.getId() == cornerId) {
+                        currentResourceType = hex.getHexResourceType();
+                        currentResourceCount = initialResourceCards.get(currentResourceType);
+                        initialResourceCards.put(currentResourceType, currentResourceCount+1);
+                    }
+                }
+            }
+
+            currentPlayer.addResourceCards(initialResourceCards);
         }
 
         private MoveResult setupEdge(int edgeId) {

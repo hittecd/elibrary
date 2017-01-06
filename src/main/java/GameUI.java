@@ -186,8 +186,6 @@ public class GameUI extends JPanel {
                 hexList = boardPanelListener.onUpdateHexList();
                 edgeList = boardPanelListener.onUpdateEdgeList();
                 cornerList = boardPanelListener.onUpdateCornerList();
-
-
             }
         };
 
@@ -682,8 +680,6 @@ public class GameUI extends JPanel {
                 lumberCountLabel.setText("Lumber: " + resourceMap.get(ResourceType.LUMBER));
                 brickCountLabel.setText("Brick: " + resourceMap.get(ResourceType.BRICK));
                 oreCountLabel.setText("Ore: " + resourceMap.get(ResourceType.ORE));
-
-
             }
         };
 
