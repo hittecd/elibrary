@@ -12,6 +12,10 @@ public class GameManager {
         public void onNewGame(int numPlayers) {
             newGame(numPlayers);
         }
+
+        public void onQuitSoC() {
+            quitSoC();
+        }
     };
 
     private Game currentGame;
@@ -36,7 +40,6 @@ public class GameManager {
 
         mainGameFrameUI.remove(mainMenuUI);
 
-
         mainGameFrameUI.setContentPane(currentGame.getGameUI());
         mainGameFrameUI.pack();
         mainGameFrameUI.setLocationRelativeTo(null);
@@ -54,9 +57,8 @@ public class GameManager {
      * deleteGame()
      */
 
-    /**
-     * TODO: implement quit support
-     * quit()
-     */
+    private void quitSoC() {
+        System.exit(0);
+    }
 
 }

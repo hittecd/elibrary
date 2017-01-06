@@ -15,6 +15,7 @@ public class MainMenuUI extends JPanel {
     private final JLabel newGameLabel = new JLabel("New Game");
     private final JButton newGameBtn3 = new JButton("3 Players");
     private final JButton newGameBtn4 = new JButton("4 Players");
+    private final JButton quitGameBtn = new JButton("Quit Settlers of Catan ");
 
     /**
      * TODO: implement load features
@@ -39,6 +40,8 @@ public class MainMenuUI extends JPanel {
                 mainMenuUIListener.onNewGame(3);
             else if(e.getSource() == newGameBtn4)
                 mainMenuUIListener.onNewGame(4);
+            else if(e.getSource() == quitGameBtn)
+                mainMenuUIListener.onQuitSoC();
         }
     };
 
@@ -64,10 +67,12 @@ public class MainMenuUI extends JPanel {
 
         newGameBtn3.addActionListener(mainMenuUIActionListener);
         newGameBtn4.addActionListener(mainMenuUIActionListener);
+        quitGameBtn.addActionListener(mainMenuUIActionListener);
 
         controlPanel.add(newGameLabel);
         controlPanel.add(newGameBtn3);
         controlPanel.add(newGameBtn4);
+        controlPanel.add(quitGameBtn);
 
         controlPanel.setBorder(blackline);
         controlPanel.setPreferredSize(new Dimension(300, 300));
@@ -85,6 +90,8 @@ public class MainMenuUI extends JPanel {
 
     public interface MainMenuUIListener {
         void onNewGame(int numPlayers);
+
+        void onQuitSoC();
     }
 
 }
