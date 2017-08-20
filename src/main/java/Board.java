@@ -84,7 +84,7 @@ public class Board {
         return true;
     }
 
-    public List<Integer> getChooseablePlayers(int currentPlayerId) {
+    public List<Integer> getRobbablePlayers(int currentPlayerId) {
         List<Integer> playerIdList = new ArrayList();
 
         int playerId;

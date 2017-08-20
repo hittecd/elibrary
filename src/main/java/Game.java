@@ -424,13 +424,13 @@ public class Game {
         }
     };
 
-    private final GameUI.ChoosePlayerPanelListener choosePlayerPanelListener = new GameUI.ChoosePlayerPanelListener() {
-        public List<Integer> getChoosablePlayers() {
+    private final GameUI.RobPlayerPanelListener robPlayerPanelListener = new GameUI.RobPlayerPanelListener() {
+        public List<Integer> getRobbablePlayers() {
             Player currentPlayer = playerManager.getCurrentPlayer();
-            return board.getChooseablePlayers(currentPlayer.getPlayerId());
+            return board.getRobbablePlayers(currentPlayer.getPlayerId());
         }
 
-        public void onChoosePlayer(int targetPlayerId) {
+        public void onRobPlayer(int targetPlayerId) {
             if(targetPlayerId >= 0) {
                 Player targetPlayer = playerManager.getPlayerById(targetPlayerId);
                 Map<ResourceType, Integer> stolenCardMap = targetPlayer.stealResourceCard();
@@ -461,7 +461,7 @@ public class Game {
         gameUI.setControlPanelListener(controlPanelListener);
         gameUI.setResourcePanelListener(resourcePanelLister);
         gameUI.setDevCardPanelListener(devCardPanelListener);
-        gameUI.setChoosePlayerPanelListener(choosePlayerPanelListener);
+        gameUI.setRobPlayerPanelListener(robPlayerPanelListener);
 
         updateState(GameState.SETUP_BOARD);
     }

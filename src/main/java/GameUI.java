@@ -21,7 +21,7 @@ public class GameUI extends JPanel {
     private final DevCardPanel devCardPanel = new DevCardPanel();
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPanel = new BoardPanel();
-    private final ChoosePlayerPanel choosePlayerPanel = new ChoosePlayerPanel();
+    private final RobPlayerPanel choosePlayerPanel = new RobPlayerPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
 
@@ -51,7 +51,7 @@ public class GameUI extends JPanel {
     private ControlPanelListener controlPanelListener;
     private ResourcePanelListener resourcePanelListener;
     private DevCardPanelListener devCardPanelListener;
-    private ChoosePlayerPanelListener choosePlayerPanelListener;
+    private RobPlayerPanelListener robPlayerPanelListener;
 
     //private GameState gameState;
 
@@ -97,8 +97,8 @@ public class GameUI extends JPanel {
 
     public void setDevCardPanelListener(DevCardPanelListener listener) { devCardPanelListener = listener; }
 
-    public void setChoosePlayerPanelListener(ChoosePlayerPanelListener listener) {
-        choosePlayerPanelListener = listener;
+    public void setRobPlayerPanelListener(RobPlayerPanelListener listener) {
+        robPlayerPanelListener = listener;
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
@@ -771,15 +771,15 @@ public class GameUI extends JPanel {
         Map<DevelopmentCard, Integer> onUpdateDevCardPanel();
     }
 
-    private class ChoosePlayerPanel extends JPanel {
+    private class RobPlayerPanel extends JPanel {
 
-        private final JLabel choosePlayerPanelTitle = new JLabel("Choose Player:");
+        private final JLabel robPlayerPanelTitle = new JLabel("Choose Player to Rob:");
         private final JButton player0Btn = new JButton("Player 0");
         private final JButton player1Btn = new JButton("Player 1");
         private final JButton player2Btn = new JButton("Player 2");
         private final JButton player3Btn = new JButton("Player 3");
 
-        private final JLabel noChoosablePlayersTitle = new JLabel("There are no choosable Players for this location.");
+        private final JLabel noRobbablePlayersTitle = new JLabel("There are no Players to rob at this location.");
         private final JButton continueBtn = new JButton("Continue");
 
         private final Map<Integer, JButton> playerBtnIndex = new HashMap();
@@ -787,60 +787,60 @@ public class GameUI extends JPanel {
         public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
             public void updateState(GameState newState) {
                 if(newState == GameState.CHOOSE_VICTIM) {
-                    ChoosePlayerPanel.this.removeAll();
+                    RobPlayerPanel.this.removeAll();
 
-                    List<Integer> playerIdList = choosePlayerPanelListener.getChoosablePlayers();
+                    List<Integer> playerIdList = robPlayerPanelListener.getRobbablePlayers();
 
                     if(playerIdList.size() > 0) {
-                        ChoosePlayerPanel.this.add(choosePlayerPanelTitle);
+                        RobPlayerPanel.this.add(robPlayerPanelTitle);
 
                         JButton playerBtn;
                         for (Integer playerId : playerIdList) {
                             playerBtn = playerBtnIndex.get(playerId);
 
                             if (playerBtn != null)
-                                ChoosePlayerPanel.this.add(playerBtn);
+                                RobPlayerPanel.this.add(playerBtn);
                         }
                     }
                     else {
-                        ChoosePlayerPanel.this.add(noChoosablePlayersTitle);
-                        ChoosePlayerPanel.this.add(continueBtn);
+                        RobPlayerPanel.this.add(noRobbablePlayersTitle);
+                        RobPlayerPanel.this.add(continueBtn);
                     }
                 }
             }
         };
 
-        public ChoosePlayerPanel() {
+        public RobPlayerPanel() {
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             player0Btn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    choosePlayerPanelListener.onChoosePlayer(0);
+                    robPlayerPanelListener.onRobPlayer(0);
                 }
             });
 
             player1Btn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    choosePlayerPanelListener.onChoosePlayer(1);
+                    robPlayerPanelListener.onRobPlayer(1);
                 }
             });
 
             player2Btn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    choosePlayerPanelListener.onChoosePlayer(2);
+                    robPlayerPanelListener.onRobPlayer(2);
                 }
             });
 
             player3Btn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    choosePlayerPanelListener.onChoosePlayer(3);
+                    robPlayerPanelListener.onRobPlayer(3);
                 }
             });
 
             continueBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    choosePlayerPanelListener.onChoosePlayer(-1);
+                    robPlayerPanelListener.onRobPlayer(-1);
                 }
             });
 
@@ -856,9 +856,9 @@ public class GameUI extends JPanel {
 
     }
 
-    public interface ChoosePlayerPanelListener {
-        List<Integer> getChoosablePlayers();
+    public interface RobPlayerPanelListener {
+        List<Integer> getRobbablePlayers();
 
-        void onChoosePlayer(int targetPlayerId);
+        void onRobPlayer(int targetPlayerId);
     }
 }
