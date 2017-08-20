@@ -17,6 +17,5 @@ public enum GameState {
     PLAY_VICTORY_POINT,
     PLAY_MONOPOLY,
     PLAY_ROAD_BUILDER,
-    END_TURN,
     GAME_WON
 }

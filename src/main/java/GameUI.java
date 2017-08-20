@@ -21,6 +21,7 @@ public class GameUI extends JPanel {
     private final DevCardPanel devCardPanel = new DevCardPanel();
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPanel = new BoardPanel();
+    private final ChoosePlayerPanel choosePlayerPanel = new ChoosePlayerPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
 
@@ -28,18 +29,29 @@ public class GameUI extends JPanel {
         controlPanel.victoryPointLabel.setText("Victory Points: " + vp);
     }
 
-    /*
     private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
         public void updateState(GameState newState) {
-            gameState = newState;
+            leftPane.removeAll();
+
+            if(newState == GameState.CHOOSE_VICTIM) {
+                leftPane.add(choosePlayerPanel);
+            }
+            else {
+                leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
+                leftPane.add(boardPanel);
+            }
+
+            // redraw ui
+            GameUI.this.revalidate();
+            GameUI.this.repaint();
         }
     };
-    */
 
     private BoardPanelListener boardPanelListener;
     private ControlPanelListener controlPanelListener;
     private ResourcePanelListener resourcePanelListener;
     private DevCardPanelListener devCardPanelListener;
+    private ChoosePlayerPanelListener choosePlayerPanelListener;
 
     //private GameState gameState;
 
@@ -52,6 +64,8 @@ public class GameUI extends JPanel {
         game.registerUpdateStateListener(resourcePanel.getUpdateStateListener());
         game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
         game.registerUpdateStateListener(devCardPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(choosePlayerPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(this.getUpdateStateListener());
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
         leftPane.add(boardPanel);
@@ -63,6 +77,10 @@ public class GameUI extends JPanel {
 
         this.add(leftPane);
         this.add(rightPane);
+    }
+
+    public Game.UpdateStateListener getUpdateStateListener() {
+        return updateStateListener;
     }
 
     public void setBoardPanelListener(BoardPanelListener listener) {
@@ -77,7 +95,11 @@ public class GameUI extends JPanel {
         resourcePanelListener = listener;
     }
 
-    public void setDevCardPanelListener(DevCardPanelListener listener){ devCardPanelListener = listener;}
+    public void setDevCardPanelListener(DevCardPanelListener listener) { devCardPanelListener = listener; }
+
+    public void setChoosePlayerPanelListener(ChoosePlayerPanelListener listener) {
+        choosePlayerPanelListener = listener;
+    }
 
     private class BoardPanel extends JPanel implements MouseListener {
         private final int WIDTH = 990;
@@ -310,7 +332,7 @@ public class GameUI extends JPanel {
                 g2d.setColor(defaultColor);
                 int val = hex.getHexValue();
                 String text = String.format("%s", val);
-                if(val == 0){
+                if(hex.hasRobber()){
                     text = "R";
                     g2d.setColor(new Color(0x008080));
                     g2d.fillOval(XCenters[i]+origin.x - 15, YCenters[i]+origin.y - 15, 30, 30);
@@ -747,5 +769,96 @@ public class GameUI extends JPanel {
 
     public interface DevCardPanelListener {
         Map<DevelopmentCard, Integer> onUpdateDevCardPanel();
+    }
+
+    private class ChoosePlayerPanel extends JPanel {
+
+        private final JLabel choosePlayerPanelTitle = new JLabel("Choose Player:");
+        private final JButton player0Btn = new JButton("Player 0");
+        private final JButton player1Btn = new JButton("Player 1");
+        private final JButton player2Btn = new JButton("Player 2");
+        private final JButton player3Btn = new JButton("Player 3");
+
+        private final JLabel noChoosablePlayersTitle = new JLabel("There are no choosable Players for this location.");
+        private final JButton continueBtn = new JButton("Continue");
+
+        private final Map<Integer, JButton> playerBtnIndex = new HashMap();
+
+        public final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+                if(newState == GameState.CHOOSE_VICTIM) {
+                    ChoosePlayerPanel.this.removeAll();
+
+                    List<Integer> playerIdList = choosePlayerPanelListener.getChoosablePlayers();
+
+                    if(playerIdList.size() > 0) {
+                        ChoosePlayerPanel.this.add(choosePlayerPanelTitle);
+
+                        JButton playerBtn;
+                        for (Integer playerId : playerIdList) {
+                            playerBtn = playerBtnIndex.get(playerId);
+
+                            if (playerBtn != null)
+                                ChoosePlayerPanel.this.add(playerBtn);
+                        }
+                    }
+                    else {
+                        ChoosePlayerPanel.this.add(noChoosablePlayersTitle);
+                        ChoosePlayerPanel.this.add(continueBtn);
+                    }
+                }
+            }
+        };
+
+        public ChoosePlayerPanel() {
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+            player0Btn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    choosePlayerPanelListener.onChoosePlayer(0);
+                }
+            });
+
+            player1Btn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    choosePlayerPanelListener.onChoosePlayer(1);
+                }
+            });
+
+            player2Btn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    choosePlayerPanelListener.onChoosePlayer(2);
+                }
+            });
+
+            player3Btn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    choosePlayerPanelListener.onChoosePlayer(3);
+                }
+            });
+
+            continueBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    choosePlayerPanelListener.onChoosePlayer(-1);
+                }
+            });
+
+            playerBtnIndex.put(0, player0Btn);
+            playerBtnIndex.put(1, player1Btn);
+            playerBtnIndex.put(2, player2Btn);
+            playerBtnIndex.put(3, player3Btn);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return this.updateStateListener;
+        }
+
+    }
+
+    public interface ChoosePlayerPanelListener {
+        List<Integer> getChoosablePlayers();
+
+        void onChoosePlayer(int targetPlayerId);
     }
 }

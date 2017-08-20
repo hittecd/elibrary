@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class Player {
@@ -46,7 +43,11 @@ public class Player {
     }
 
     public Map<ResourceType, Integer> getResourceCards() {
-        return new HashMap<ResourceType, Integer>(resourceCards);
+        Map<ResourceType, Integer> resourceCardsDeepCopy = new HashMap();
+        for(ResourceType resourceType : resourceCards.keySet())
+            resourceCardsDeepCopy.put(resourceType, new Integer(resourceCards.get(resourceType)));
+
+        return resourceCardsDeepCopy;
     }
 
     public Map<DevelopmentCard, Integer> getDevCards() {
@@ -93,7 +94,7 @@ public class Player {
         Integer currentCount;
         Integer removeCount;
         boolean success = true;
-        Map<ResourceType, Integer> updatedResourceMap = new HashMap();
+        Map<ResourceType, Integer> updatedResourceMap = getResourceCards();
 
         for(ResourceType resourceType : spentResourceCards.keySet()) {
             currentCount = resourceCards.get(resourceType);
@@ -116,6 +117,30 @@ public class Player {
         }
 
         return success;
+    }
+
+    public Map<ResourceType, Integer> stealResourceCard() {
+        ArrayList<ResourceType> shuffledHand = new ArrayList();
+        for(ResourceType resourceType : resourceCards.keySet()) {
+            int cardCount = resourceCards.get(resourceType);
+            while(cardCount > 0) {
+                shuffledHand.add(resourceType);
+                cardCount--;
+            }
+        }
+
+        if(shuffledHand.size() == 0)
+            return null;
+
+        Collections.shuffle(shuffledHand);
+
+        ResourceType stolenCardType = shuffledHand.get(0);
+
+        Map<ResourceType, Integer> stolenCardMap = new HashMap();
+        stolenCardMap.put(stolenCardType, 1);
+        spendResourceCards(stolenCardMap);
+
+        return stolenCardMap;
     }
 
     public void playDevelopmentCard(DevelopmentCard developmentCard) {}

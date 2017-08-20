@@ -91,7 +91,7 @@ public class Game {
                 );
             }
             else {
-                bank.deAllocateResourceCards(settlementCards);
+                bank.deallocateResourceCards(settlementCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_SETTLEMENT);
 
@@ -124,7 +124,7 @@ public class Game {
                 );
             }
             else {
-                bank.deAllocateResourceCards(cityCards);
+                bank.deallocateResourceCards(cityCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.BUILD_CITY);
 
@@ -160,7 +160,7 @@ public class Game {
                 );
             }
             else {
-                bank.deAllocateResourceCards(devCards);
+                bank.deallocateResourceCards(devCards);
 
                 DevelopmentCard dc = bank.getDevelopmentCard();
                 devCardList.put(dc,1);
@@ -192,7 +192,7 @@ public class Game {
                 // validate player resources
                 p.addResourceCards(cityCards);
 
-                bank.deAllocateResourceCards(cityCards);
+                bank.deallocateResourceCards(cityCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.TURN_STARTED);
             }
@@ -209,7 +209,7 @@ public class Game {
                 // validate player resources
                 p.addResourceCards(settlementCards);
 
-                bank.deAllocateResourceCards(settlementCards);
+                bank.deallocateResourceCards(settlementCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.TURN_STARTED);
             }
@@ -226,7 +226,7 @@ public class Game {
                 // validate player resources
                 p.addResourceCards(roadCards);
 
-                bank.deAllocateResourceCards(roadCards);
+                bank.deallocateResourceCards(roadCards);
                 result = new MoveResult(true, "");
                 updateState(GameState.TURN_STARTED);
             }
@@ -258,12 +258,18 @@ public class Game {
                 rollVal = rollDice();
 
                 List<Hex> rolledHexes = board.getHexesByRollValue(rollVal);
-                Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
 
-                for (Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
-                    bank.allocateResourceCards(resourceMap);
+                if(rollVal != 7) {
+                    Map<Player, Map<ResourceType, Integer>> playerToResourceMap = playerManager.resolveResources(rolledHexes);
 
-                updateState(GameState.TURN_STARTED);
+                    for (Map<ResourceType, Integer> resourceMap : playerToResourceMap.values())
+                        bank.allocateResourceCards(resourceMap);
+
+                    updateState(GameState.TURN_STARTED);
+                }
+                else {
+                    updateState(GameState.PLACE_ROBBER);
+                }
 
                 result = new MoveResult(true, "A " + rollVal + " was rolled!");
             }
@@ -300,20 +306,34 @@ public class Game {
         public MoveResult onCornerClick(int cornerId) {
             System.out.println("CORNER DETECTED IN GAME: " + cornerId);
 
-            MoveResult result;
+            MoveResult result = new MoveResult();
+            boolean success;
+
             Player currentPlayer = playerManager.getCurrentPlayer();
 
-            if(gameState == GameState.SETUP_BOARD) {
-                return setupBoardManager.setupCorner(cornerId);
-            }
-            else if(gameState == GameState.BUILD_SETTLEMENT) {
-                result = board.buildSettlement(currentPlayer, cornerId, false);
+            if(gameState == GameState.BUILD_SETTLEMENT) {
+                success = board.buildSettlement(currentPlayer, cornerId, false);
+
+                result.setSuccess(success);
+
+                if(!result.isSuccess()) {
+                    result.setMessage("Failed to build Settlement. Check your placement and try again.");
+                }
             }
             else if(gameState == GameState.BUILD_CITY) {
-                result = board.buildCity(currentPlayer, cornerId);
+                success = board.buildCity(currentPlayer, cornerId);
+
+                result.setSuccess(success);
+
+                if(!result.isSuccess()) {
+                    result.setMessage("Failed to build City. Check your placement and try again.");
+                }
+            }
+            else if(gameState == GameState.SETUP_BOARD) {
+                return setupBoardManager.setupCorner(cornerId);
             }
             else {
-                result = new MoveResult(false, "Cannot build Settlement/City at this time.");
+                result.setMessage("Cannot build Settlement/City at this time.");
             }
 
             if(result.isSuccess()) {
@@ -333,19 +353,24 @@ public class Game {
         public MoveResult onEdgeClick(int edgeId) {
             System.out.println("EDGE DETECTED IN GAME: " + edgeId);
 
-            MoveResult result;
+            MoveResult result = new MoveResult();
+            boolean success;
+
             Player currentPlayer = playerManager.getCurrentPlayer();
 
-            if(gameState == GameState.SETUP_BOARD) {
-                result = setupBoardManager.setupEdge(edgeId);
-            }
-            else if(gameState == GameState.BUILD_ROAD) {
-                result = board.buildRoad(currentPlayer, edgeId);
+            if(gameState == GameState.BUILD_ROAD) {
+                success = board.buildRoad(currentPlayer, edgeId);
+
+                result.setSuccess(success);
+
                 if(result.isSuccess())
                     updateState(GameState.TURN_STARTED);
             }
+            else if(gameState == GameState.SETUP_BOARD) {
+                return setupBoardManager.setupEdge(edgeId);
+            }
             else
-                result = new MoveResult(false, "Cannot build Road at this time.");
+                result.setMessage("Cannot build Road at this time.");
 
             return result;
         }
@@ -353,13 +378,21 @@ public class Game {
         public MoveResult onHexClick(int hexId) {
             System.out.println("HEX DETECTED IN GAME: " + hexId);
 
-            MoveResult result;
-            Player currentPlayer = playerManager.getCurrentPlayer();
+            MoveResult result = new MoveResult();
 
-            if(gameState == GameState.PLACE_ROBBER)
-                result = board.placeRobber(currentPlayer, hexId);
+            if(gameState == GameState.PLACE_ROBBER) {
+                boolean success = board.moveRobber(hexId);
+
+                if(success) {
+                    result.setSuccess(true);
+
+                    updateState(GameState.CHOOSE_VICTIM);
+                }
+                else
+                    result.setMessage("Cannot place Robber here. Check placement and try again");
+            }
             else
-                result = new MoveResult(false, "Cannot place Robber at this time");
+                result.setMessage("Cannot place Robber at this time");
 
             return result;
         }
@@ -376,6 +409,7 @@ public class Game {
             return board.getCornerList();
         }
     };
+
     private final GameUI.ResourcePanelListener resourcePanelLister = new GameUI.ResourcePanelListener() {
         public Map<ResourceType, Integer> onUpdateResourcePanel() {
             Player currentPlayer = playerManager.getCurrentPlayer();
@@ -387,6 +421,27 @@ public class Game {
         public Map<DevelopmentCard, Integer> onUpdateDevCardPanel() {
             Player currentPlayer = playerManager.getCurrentPlayer();
             return currentPlayer.getDevCards();
+        }
+    };
+
+    private final GameUI.ChoosePlayerPanelListener choosePlayerPanelListener = new GameUI.ChoosePlayerPanelListener() {
+        public List<Integer> getChoosablePlayers() {
+            Player currentPlayer = playerManager.getCurrentPlayer();
+            return board.getChooseablePlayers(currentPlayer.getPlayerId());
+        }
+
+        public void onChoosePlayer(int targetPlayerId) {
+            if(targetPlayerId >= 0) {
+                Player targetPlayer = playerManager.getPlayerById(targetPlayerId);
+                Map<ResourceType, Integer> stolenCardMap = targetPlayer.stealResourceCard();
+
+                if (stolenCardMap != null) {
+                    Player currentPlayer = playerManager.getCurrentPlayer();
+                    currentPlayer.addResourceCards(stolenCardMap);
+                }
+            }
+
+            updateState(GameState.TURN_STARTED);
         }
     };
 
@@ -406,6 +461,7 @@ public class Game {
         gameUI.setControlPanelListener(controlPanelListener);
         gameUI.setResourcePanelListener(resourcePanelLister);
         gameUI.setDevCardPanelListener(devCardPanelListener);
+        gameUI.setChoosePlayerPanelListener(choosePlayerPanelListener);
 
         updateState(GameState.SETUP_BOARD);
     }
@@ -448,22 +504,30 @@ public class Game {
         }
 
         private MoveResult setupCorner(int cornerId) {
-            MoveResult result;
+            MoveResult moveResult = new MoveResult();
+
             SetupStage stage = setupStages.get(setupStageIndex);
             Player player = playerManager.getCurrentPlayer();
 
-            if(stage.gameState != GameState.BUILD_SETTLEMENT)
-                result = new MoveResult(false, "Select Edge to build Road.");
-            else
-                result = board.buildSettlement(player, cornerId, true);
+            if(stage.gameState != GameState.BUILD_SETTLEMENT) {
+                moveResult.setSuccess(false);
+                moveResult.setMessage(MoveResult.ERROR_SELECT_EDGE_TO_BUILD_MSG);
+                return moveResult;
+            }
 
-            if(result.isSuccess()) {
+            if(board.buildSettlement(player, cornerId, true)) {
+                moveResult.setSuccess(true);
+
                 player.incrementVictoryPoints();
 
                 if(setupStageIndex >= ((numPlayers*4)/2))
                     assignStartingResourceCards(cornerId);
 
                 setupStageIndex++;
+            }
+            else {
+                moveResult.setSuccess(false);
+                moveResult.setMessage(MoveResult.ERROR_FAILED_TO_BUILD_MSG);
             }
 
             if(setupStageIndex == (numPlayers*4))
@@ -474,7 +538,7 @@ public class Game {
                 updateState(GameState.SETUP_BOARD);
             }
 
-            return result;
+            return moveResult;
         }
 
         private void assignStartingResourceCards(int cornerId) {
@@ -503,17 +567,24 @@ public class Game {
         }
 
         private MoveResult setupEdge(int edgeId) {
-            MoveResult result;
+            MoveResult moveResult = new MoveResult();
             SetupStage stage = setupStages.get(setupStageIndex);
             Player player = playerManager.getCurrentPlayer();
 
-            if(stage.gameState != GameState.BUILD_ROAD)
-                result = new MoveResult(false, "Select Corner to build Settlement");
-            else
-                result = board.buildRoad(player, edgeId);
+            if(stage.gameState != GameState.BUILD_ROAD) {
+                moveResult.setSuccess(false);
+                moveResult.setMessage(MoveResult.ERROR_SELECT_CORNER_TO_BUILD_MSG);
+            }
 
-            if(result.isSuccess())
+            if(board.buildRoad(player, edgeId)) {
+                moveResult.setSuccess(true);
+
                 setupStageIndex++;
+            }
+            else {
+                moveResult.setSuccess(false);
+                moveResult.setMessage(MoveResult.ERROR_FAILED_TO_BUILD_MSG);
+            }
 
             if(setupStageIndex == (numPlayers*4))
                 updateState(GameState.START_TURN);
@@ -523,7 +594,7 @@ public class Game {
                 updateState(GameState.SETUP_BOARD);
             }
 
-            return result;
+            return moveResult;
         }
     }
 }

@@ -69,4 +69,8 @@ public class Hex {
         return success;
     }
 
+    public void removeRobber() {
+        hasRobber = false;
+    }
+
 }

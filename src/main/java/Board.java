@@ -19,6 +19,8 @@ public class Board {
     private final List<Edge> edgeIndex = new ArrayList();
     private final List<Corner> cornerIndex = new ArrayList();
 
+    private static Hex robbedHex;
+
     public Board() {
         initEdges();
         initCorners();
@@ -34,48 +36,67 @@ public class Board {
         assignValuesToHexes();
     }
 
-    public MoveResult buildRoad(Player player, int edgeId) {
-        MoveResult result;
+    public boolean buildRoad(Player player, int edgeId) {
+        boolean result = false;
         Edge e = edgeIndex.get(edgeId);
 
         if(e.buildRoad(player.getPlayerId())) {
-            result = new MoveResult(true, "");
+            result = true;
             player.addEdge(e);
         }
-        else
-            result = new MoveResult(false, "Failed to build Road. Check your placement and try again.");
 
         return result;
     }
 
-    public MoveResult buildSettlement(Player player, int cornerId, boolean inSetupPhase) {
-        MoveResult result;
+    public boolean buildSettlement(Player player, int cornerId, boolean inSetupPhase) {
+        boolean result = false;
         Corner c = cornerIndex.get(cornerId);
 
         if(c.buildSettlement(player.getPlayerId(), inSetupPhase)) {
-            result = new MoveResult(true, "");
+            result = true;
             player.addCorner(c);
         }
-        else
-            result = new MoveResult(false, "Failed to build Settlement. Check your placement and try again.");
 
         return result;
     }
 
-    public MoveResult buildCity(Player player, int cornerId) {
-        MoveResult result;
+    public boolean buildCity(Player player, int cornerId) {
+        boolean result = false;
         Corner c = cornerIndex.get(cornerId);
 
-        if(c.buildCity(player.getPlayerId()))
-            result = new MoveResult(true, "");
-        else
-            result = new MoveResult(false, "Failed to build City. Check your placement and try again.");
+        if(c.buildCity(player.getPlayerId())) {
+            result = true;
+            player.addCorner(c);
+        }
 
         return result;
     }
 
-    public MoveResult placeRobber(Player player, int hexId) {
-        return null;
+    public boolean moveRobber(int hexId) {
+        Hex hex = hexIndex.get(hexId);
+
+        if(!hex.placeRobber())
+            return false;
+
+        robbedHex.removeRobber();
+        robbedHex = hex;
+
+        return true;
+    }
+
+    public List<Integer> getChooseablePlayers(int currentPlayerId) {
+        List<Integer> playerIdList = new ArrayList();
+
+        int playerId;
+        for(Corner corner : robbedHex.getCorners()) {
+            playerId = corner.getPlayerId();
+
+            if(playerId >= 0 && playerId != currentPlayerId) {
+                playerIdList.add(playerId);
+            }
+        }
+
+        return playerIdList;
     }
 
     public List<Hex> getHexesByRollValue(int rollVal) {
@@ -1848,6 +1869,11 @@ public class Board {
             resourceType = resources.get(i);
 
             hex.setHexResourceType(resourceType);
+
+            if(resourceType == ResourceType.DESERT) {
+                hex.placeRobber();
+                robbedHex = hex;
+            }
         }
     }
 

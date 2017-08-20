@@ -146,7 +146,7 @@ public class Bank {
         }
     }
 
-    public void deAllocateResourceCards(Map<ResourceType, Integer> allocatedCards) {
+    public void deallocateResourceCards(Map<ResourceType, Integer> allocatedCards) {
         int currentCount;
         int allocatedCount;
         int newCount;
