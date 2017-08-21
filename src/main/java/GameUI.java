@@ -4,11 +4,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class GameUI extends JPanel {
@@ -933,7 +930,8 @@ public class GameUI extends JPanel {
 
             victoryPointDevCardBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    playDevCardPanelListener.onPlayVictoryPointDevCard();
+                    MoveResult result = playDevCardPanelListener.onPlayVictoryPointDevCard();
+                    notificationPane.showMessageDialog(null, result.getMessage());
                 }
             });
 
@@ -978,7 +976,7 @@ public class GameUI extends JPanel {
     public interface PlayDevCardPanelListener {
         MoveResult onPlayKnightDevCard();
 
-        void onPlayVictoryPointDevCard();
+        MoveResult onPlayVictoryPointDevCard();
 
         MoveResult onPlayRoadBuilderDevCard();
 

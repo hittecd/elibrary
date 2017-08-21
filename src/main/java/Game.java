@@ -475,8 +475,30 @@ public class Game {
             return result;
         }
 
-        public void onPlayVictoryPointDevCard() {
+        public MoveResult onPlayVictoryPointDevCard() {
+            MoveResult result = new MoveResult();
 
+            if(gameState == GameState.PLAY_DEV_CARD) {
+                updateState(GameState.TURN_STARTED);
+
+                Player currentPlayer = playerManager.getCurrentPlayer();
+
+                if(playerManager.victoryPointPlayed()) {
+                    result.setSuccess(true);
+                    result.setMessage("Player " + currentPlayer.getPlayerId() + " successfully played a Victory Point " +
+                            "Development Card.");
+                }
+                else {
+                    result.setSuccess(false);
+                    result.setMessage("You do not currently have a Victory Point Development Card in your inventory.");
+                }
+            }
+            else {
+                result.setSuccess(false);
+                result.setMessage("You cannot play a Development Card at this time.");
+            }
+
+            return result;
         }
 
         public MoveResult onPlayRoadBuilderDevCard() {

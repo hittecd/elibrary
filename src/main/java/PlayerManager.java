@@ -129,4 +129,14 @@ public class PlayerManager {
 
         largestArmyPlayer = newLargestArmyPlayer;
     }
+
+    public boolean victoryPointPlayed() {
+        if(currentPlayer.playDevelopmentCard(DevelopmentCard.VICTORY_POINT)) {
+            currentPlayer.incrementVictoryPoints();
+
+            return true;
+        }
+
+        return false;
+    }
 }

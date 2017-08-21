@@ -33,20 +33,19 @@ public class Player {
     }
 
     private void initResourceCards() {
-        resourceCards.put(ResourceType.SHEEP, 0);
-        resourceCards.put(ResourceType.WHEAT, 0);
-        resourceCards.put(ResourceType.ORE, 0);
-        resourceCards.put(ResourceType.LUMBER, 0);
-        resourceCards.put(ResourceType.BRICK, 0);
+        resourceCards.put(ResourceType.SHEEP, 10);
+        resourceCards.put(ResourceType.WHEAT, 10);
+        resourceCards.put(ResourceType.ORE, 10);
+        resourceCards.put(ResourceType.LUMBER, 10);
+        resourceCards.put(ResourceType.BRICK, 10);
     }
 
     private void initDevelopmentCards() {
-        //developmentCards.put(DevelopmentCard.KNIGHT, 0);
         developmentCards.put(DevelopmentCard.KNIGHT, 10);
-        developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY, 0);
-        developmentCards.put(DevelopmentCard.ROAD_BUILDER, 0);
-        developmentCards.put(DevelopmentCard.MONOPOLY, 0);
-        developmentCards.put(DevelopmentCard.VICTORY_POINT, 0);
+        developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY, 10);
+        developmentCards.put(DevelopmentCard.ROAD_BUILDER, 10);
+        developmentCards.put(DevelopmentCard.MONOPOLY, 10);
+        developmentCards.put(DevelopmentCard.VICTORY_POINT, 10);
     }
 
     public Map<ResourceType, Integer> getResourceCards() {
