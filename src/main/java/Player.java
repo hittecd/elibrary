@@ -9,7 +9,9 @@ public class Player {
     private final List<Corner> cornersList = new ArrayList();
 
     private int playerId;
+    private int knightCount = 0;
     private int victoryPoints = 0;
+    private boolean hasLargestArmy = false;
 
     public Player(int playerId) {
         this.playerId = playerId;
@@ -20,6 +22,10 @@ public class Player {
 
     public int getPlayerId() {
         return playerId;
+    }
+
+    public int getKnightCount() {
+        return knightCount;
     }
 
     public int getVictoryPoints() {
@@ -35,7 +41,8 @@ public class Player {
     }
 
     private void initDevelopmentCards() {
-        developmentCards.put(DevelopmentCard.KNIGHT, 0);
+        //developmentCards.put(DevelopmentCard.KNIGHT, 0);
+        developmentCards.put(DevelopmentCard.KNIGHT, 10);
         developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY, 0);
         developmentCards.put(DevelopmentCard.ROAD_BUILDER, 0);
         developmentCards.put(DevelopmentCard.MONOPOLY, 0);
@@ -143,7 +150,16 @@ public class Player {
         return stolenCardMap;
     }
 
-    public void playDevelopmentCard(DevelopmentCard developmentCard) {}
+    public boolean playDevelopmentCard(DevelopmentCard devCardType) {
+        int devCardCount = developmentCards.get(devCardType);
+
+        if(devCardCount > 0) {
+            developmentCards.put(devCardType, new Integer(devCardCount - 1));
+            return true;
+        }
+
+        return false;
+    }
 
     public void addEdge(Edge e) {
         edgesList.add(e);
@@ -155,5 +171,19 @@ public class Player {
 
     public void incrementVictoryPoints() {
         victoryPoints++;
+    }
+
+    public void incrementKnightCount() {
+        knightCount++;
+    }
+
+    public void awardLargestArmyBonus() {
+        hasLargestArmy = true;
+        victoryPoints += 2;
+    }
+
+    public void loseLargestArmyBonus() {
+        hasLargestArmy = false;
+        victoryPoints -= 2;
     }
 }

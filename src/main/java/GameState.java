@@ -12,6 +12,7 @@ public enum GameState {
     PLACE_ROBBER,
     PAY_7_TAX,
     CHOOSE_VICTIM,
+    PLAY_DEV_CARD,
     PLAY_KNIGHT,
     PLAY_YEAR_OF_PLENTY,
     PLAY_VICTORY_POINT,

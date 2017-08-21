@@ -6,8 +6,11 @@ import java.util.Map;
 
 public class PlayerManager {
 
-    private int numPlayers;
+    private final int numPlayers;
     private final List<Player> playersList = new ArrayList();
+
+    private Player largestArmyPlayer = null;
+
     private int currentPlayerIndex;
     private Player currentPlayer;
 
@@ -37,6 +40,10 @@ public class PlayerManager {
         currentPlayer = playersList.get(currentPlayerIndex);
     }
 
+    public Player getLargestArmyPlayer() {
+        return largestArmyPlayer;
+    }
+
     public Player getPlayerById(int playerId) {
         Player result = null;
 
@@ -47,6 +54,7 @@ public class PlayerManager {
 
         return result;
     }
+
 
     public void setPlayerById(int playerId) {
         currentPlayer = playersList.get(playerId);
@@ -86,5 +94,39 @@ public class PlayerManager {
         }
 
         return result;
+    }
+
+    public boolean knightPlayed() {
+        if(currentPlayer.playDevelopmentCard(DevelopmentCard.KNIGHT)) {
+            currentPlayer.incrementKnightCount();
+            updateLargestArmy();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateLargestArmy() {
+        Player currentLargestArmyPlayer = largestArmyPlayer;
+        Player newLargestArmyPlayer = null;
+        int maxKnightCount = 0;
+
+        for(Player p : playersList) {
+            int playerKnightCount = p.getKnightCount();
+            if(playerKnightCount > 3 && playerKnightCount > maxKnightCount) {
+                newLargestArmyPlayer = p;
+            }
+        }
+
+        if(newLargestArmyPlayer != null) {
+            newLargestArmyPlayer.awardLargestArmyBonus();
+        }
+
+        if(currentLargestArmyPlayer != null) {
+            currentLargestArmyPlayer.loseLargestArmyBonus();
+        }
+
+        largestArmyPlayer = newLargestArmyPlayer;
     }
 }

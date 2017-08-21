@@ -237,7 +237,11 @@ public class Game {
         }
 
         public MoveResult onPlayDevCard() {
-            return new MoveResult(false, "NOT IMPLEMENTED");
+            if(gameState != GameState.TURN_STARTED)
+                return new MoveResult(false, "You cannot play a Development Card at this time.");
+
+            updateState(GameState.PLAY_DEV_CARD);
+            return new MoveResult(true, "");
         }
 
         public MoveResult onTradePlayers() {
@@ -445,6 +449,53 @@ public class Game {
         }
     };
 
+    private final GameUI.PlayDevCardPanelListener playDevCardPanelListener = new GameUI.PlayDevCardPanelListener() {
+        public MoveResult onPlayKnightDevCard() {
+            MoveResult result = new MoveResult();
+
+            if(playerManager.knightPlayed()) {
+                updateState(GameState.PLACE_ROBBER);
+
+                result.setSuccess(true);
+
+                Player largestArmyPlayer = playerManager.getLargestArmyPlayer();
+                if(largestArmyPlayer != null) {
+                    result.setMessage("Player " + largestArmyPlayer.getPlayerId() + " now has the largest army with "
+                            + largestArmyPlayer.getKnightCount() + " knights.");
+                }
+                else {
+                    result.setMessage("No player has the largest army yet.");
+                }
+            }
+            else {
+                result.setSuccess(false);
+                result.setMessage("You do not currently have a Knight Development Card in your inventory.");
+            }
+
+            return result;
+        }
+
+        public void onPlayVictoryPointDevCard() {
+
+        }
+
+        public MoveResult onPlayRoadBuilderDevCard() {
+            return null;
+        }
+
+        public void onPlayYearOfPlentyDevCard() {
+
+        }
+
+        public void onPlayMonopolyDevCard() {
+
+        }
+
+        public void onCancel() {
+
+        }
+    };
+
     private GameState gameState;
     private int rollVal;
 
@@ -462,6 +513,7 @@ public class Game {
         gameUI.setResourcePanelListener(resourcePanelLister);
         gameUI.setDevCardPanelListener(devCardPanelListener);
         gameUI.setRobPlayerPanelListener(robPlayerPanelListener);
+        gameUI.setPlayDevCardPanelListener(playDevCardPanelListener);
 
         updateState(GameState.SETUP_BOARD);
     }

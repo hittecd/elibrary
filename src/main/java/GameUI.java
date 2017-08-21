@@ -4,8 +4,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class GameUI extends JPanel {
@@ -22,6 +25,7 @@ public class GameUI extends JPanel {
     private final ControlPanel controlPanel = new ControlPanel();
     private final BoardPanel boardPanel = new BoardPanel();
     private final RobPlayerPanel choosePlayerPanel = new RobPlayerPanel();
+    private final PlayDevCardPanel playDevCardPanel = new PlayDevCardPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
 
@@ -35,6 +39,9 @@ public class GameUI extends JPanel {
 
             if(newState == GameState.CHOOSE_VICTIM) {
                 leftPane.add(choosePlayerPanel);
+            }
+            if(newState == GameState.PLAY_DEV_CARD) {
+                leftPane.add(playDevCardPanel);
             }
             else {
                 leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -52,6 +59,7 @@ public class GameUI extends JPanel {
     private ResourcePanelListener resourcePanelListener;
     private DevCardPanelListener devCardPanelListener;
     private RobPlayerPanelListener robPlayerPanelListener;
+    private PlayDevCardPanelListener playDevCardPanelListener;
 
     //private GameState gameState;
 
@@ -65,6 +73,7 @@ public class GameUI extends JPanel {
         game.registerUpdateStateListener(controlPanel.getUpdateStateListener());
         game.registerUpdateStateListener(devCardPanel.getUpdateStateListener());
         game.registerUpdateStateListener(choosePlayerPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(playDevCardPanel.getUpdateStateListener());
         game.registerUpdateStateListener(this.getUpdateStateListener());
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -95,10 +104,16 @@ public class GameUI extends JPanel {
         resourcePanelListener = listener;
     }
 
-    public void setDevCardPanelListener(DevCardPanelListener listener) { devCardPanelListener = listener; }
+    public void setDevCardPanelListener(DevCardPanelListener listener) {
+        devCardPanelListener = listener;
+    }
 
     public void setRobPlayerPanelListener(RobPlayerPanelListener listener) {
         robPlayerPanelListener = listener;
+    }
+
+    public void setPlayDevCardPanelListener(PlayDevCardPanelListener listener) {
+        playDevCardPanelListener = listener;
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
@@ -412,7 +427,7 @@ public class GameUI extends JPanel {
                 g2d.drawString(text,WIDTH - w - 5,(30*i) + 5 + h-6);
             }
 
-            String[] buildKey = {"Development Card", "City","Settlement","Road"};
+            String[] buildKey = {"Development Card", "City", "Settlement", "Road"};
             int h = metrics.getHeight();
             g2d.setColor(blackColor);
             for(i = 0; i < buildKey.length; i++){
@@ -774,12 +789,12 @@ public class GameUI extends JPanel {
     private class RobPlayerPanel extends JPanel {
 
         private final JLabel robPlayerPanelTitle = new JLabel("Choose Player to Rob:");
+        private final JLabel noRobbablePlayersTitle = new JLabel("There are no Players to rob at this location.");
+
         private final JButton player0Btn = new JButton("Player 0");
         private final JButton player1Btn = new JButton("Player 1");
         private final JButton player2Btn = new JButton("Player 2");
         private final JButton player3Btn = new JButton("Player 3");
-
-        private final JLabel noRobbablePlayersTitle = new JLabel("There are no Players to rob at this location.");
         private final JButton continueBtn = new JButton("Continue");
 
         private final Map<Integer, JButton> playerBtnIndex = new HashMap();
@@ -860,5 +875,117 @@ public class GameUI extends JPanel {
         List<Integer> getRobbablePlayers();
 
         void onRobPlayer(int targetPlayerId);
+    }
+
+    private class PlayDevCardPanel extends JPanel {
+        private final JLabel playDevCardPanelTitle = new JLabel("Select a Development Card to Play:");
+
+        private final JButton knightDevCardBtn = new JButton("Knight");
+        private final JButton victoryPointDevCardBtn = new JButton("Victory Point");
+        private final JButton roadBuilderDevCardBtn = new JButton("Road Builder");
+        private final JButton yearOfPlentyDevCardBtn = new JButton("Year of Plenty");
+        private final JButton monopolyDevCardBtn = new JButton("Monopoly");
+        private final JButton cancelBtn = new JButton("Cancel");
+
+        private JLabel knightDevCardLabel;
+        private JLabel victoryPointDevCardLabel;
+        private JLabel roadBuilderDevCardLabel;
+        private JLabel yearofPlentyDevCardLabel;
+        private JLabel monoplyDevCardLabel;
+
+        private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {
+
+            }
+        };
+
+        public PlayDevCardPanel() {
+            /*
+            try {
+                BufferedImage knightDevCardImage =
+                        ImageIO.read(this.getClass().getResource("images/knight-dev-card.jpg"));
+                BufferedImage victoryPointDevCardImage =
+                        ImageIO.read(this.getClass().getResource("images/victory-point-dev-card.jpg"));
+                BufferedImage roadBuilderDevCardImage =
+                        ImageIO.read(this.getClass().getResource("images/road-builder-dev-card.jpg"));
+                BufferedImage yearOfPlentyDevCardImage =
+                        ImageIO.read(this.getClass().getResource("images/year-of-plenty-dev-card.jpg"));
+                BufferedImage monopolyDevCardImage =
+                        ImageIO.read(this.getClass().getResource("images/monopoly-dev-card.jpg"));
+
+                knightDevCardLabel = new JLabel(new ImageIcon(knightDevCardImage));
+                victoryPointDevCardLabel = new JLabel(new ImageIcon(victoryPointDevCardImage));
+                roadBuilderDevCardLabel = new JLabel(new ImageIcon(roadBuilderDevCardImage));
+                yearofPlentyDevCardLabel = new JLabel(new ImageIcon(yearOfPlentyDevCardImage));
+                monoplyDevCardLabel = new JLabel(new ImageIcon(monopolyDevCardImage));
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            */
+
+            knightDevCardBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    MoveResult result = playDevCardPanelListener.onPlayKnightDevCard();
+                    notificationPane.showMessageDialog(null, result.getMessage());
+                }
+            });
+
+            victoryPointDevCardBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    playDevCardPanelListener.onPlayVictoryPointDevCard();
+                }
+            });
+
+            roadBuilderDevCardBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    playDevCardPanelListener.onPlayRoadBuilderDevCard();
+                }
+            });
+
+            yearOfPlentyDevCardBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    playDevCardPanelListener.onPlayYearOfPlentyDevCard();
+                }
+            });
+
+            monopolyDevCardBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    playDevCardPanelListener.onPlayMonopolyDevCard();
+                }
+            });
+
+            cancelBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    playDevCardPanelListener.onCancel();
+                }
+            });
+
+            PlayDevCardPanel.this.add(knightDevCardBtn);
+            PlayDevCardPanel.this.add(victoryPointDevCardBtn);
+            PlayDevCardPanel.this.add(roadBuilderDevCardBtn);
+            PlayDevCardPanel.this.add(yearOfPlentyDevCardBtn);
+            PlayDevCardPanel.this.add(monopolyDevCardBtn);
+            PlayDevCardPanel.this.add(cancelBtn);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return updateStateListener;
+        }
+
+    }
+
+    public interface PlayDevCardPanelListener {
+        MoveResult onPlayKnightDevCard();
+
+        void onPlayVictoryPointDevCard();
+
+        MoveResult onPlayRoadBuilderDevCard();
+
+        void onPlayYearOfPlentyDevCard();
+
+        void onPlayMonopolyDevCard();
+
+        void onCancel();
     }
 }
