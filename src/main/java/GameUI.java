@@ -23,6 +23,7 @@ public class GameUI extends JPanel {
     private final BoardPanel boardPanel = new BoardPanel();
     private final RobPlayerPanel choosePlayerPanel = new RobPlayerPanel();
     private final PlayDevCardPanel playDevCardPanel = new PlayDevCardPanel();
+    private final MonopolyPanel monopolyPanel = new MonopolyPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
 
@@ -39,6 +40,9 @@ public class GameUI extends JPanel {
             }
             if(newState == GameState.PLAY_DEV_CARD) {
                 leftPane.add(playDevCardPanel);
+            }
+            if(newState == GameState.PLAY_MONOPOLY) {
+                leftPane.add(monopolyPanel);
             }
             else {
                 leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -57,12 +61,9 @@ public class GameUI extends JPanel {
     private DevCardPanelListener devCardPanelListener;
     private RobPlayerPanelListener robPlayerPanelListener;
     private PlayDevCardPanelListener playDevCardPanelListener;
-
-    //private GameState gameState;
+    private MonopolyPanelListener monopolyPanelListener;
 
     public GameUI(Game game) {
-        //game.registerUpdateStateListener(updateStateListener);
-
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         game.registerUpdateStateListener(boardPanel.getUpdateStateListener());
@@ -71,6 +72,7 @@ public class GameUI extends JPanel {
         game.registerUpdateStateListener(devCardPanel.getUpdateStateListener());
         game.registerUpdateStateListener(choosePlayerPanel.getUpdateStateListener());
         game.registerUpdateStateListener(playDevCardPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(monopolyPanel.getUpdateStateListener());
         game.registerUpdateStateListener(this.getUpdateStateListener());
 
         leftPane.setLayout(new BoxLayout(leftPane, BoxLayout.PAGE_AXIS));
@@ -111,6 +113,10 @@ public class GameUI extends JPanel {
 
     public void setPlayDevCardPanelListener(PlayDevCardPanelListener listener) {
         playDevCardPanelListener = listener;
+    }
+
+    public void setMonopolyPanelListener(MonopolyPanelListener listener) {
+        monopolyPanelListener = listener;
     }
 
     private class BoardPanel extends JPanel implements MouseListener {
@@ -891,9 +897,7 @@ public class GameUI extends JPanel {
         private JLabel monoplyDevCardLabel;
 
         private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
-            public void updateState(GameState newState) {
-
-            }
+            public void updateState(GameState newState) {}
         };
 
         public PlayDevCardPanel() {
@@ -950,7 +954,9 @@ public class GameUI extends JPanel {
 
             monopolyDevCardBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    playDevCardPanelListener.onPlayMonopolyDevCard();
+                    MoveResult result = playDevCardPanelListener.onPlayMonopolyDevCard();
+                    if(!result.isSuccess())
+                        notificationPane.showMessageDialog(null, result.getMessage());
                 }
             });
 
@@ -983,8 +989,74 @@ public class GameUI extends JPanel {
 
         void onPlayYearOfPlentyDevCard();
 
-        void onPlayMonopolyDevCard();
+        MoveResult onPlayMonopolyDevCard();
 
         void onCancel();
+    }
+
+    private class MonopolyPanel extends JPanel {
+        private final JLabel playDevCardPanelTitle = new JLabel("Select a Resource Type:");
+
+        private final JButton wheatResourceTypeBtn = new JButton("Wheat");
+        private final JButton lumberResourceTypeBtn= new JButton("Lumber");
+        private final JButton brickResourceTypeBtn = new JButton("Brick");
+        private final JButton oreResourceTypeBtn = new JButton("Ore");
+        private final JButton sheepResourceTypeBtn = new JButton("Sheep");
+
+        private JLabel wheatResourceTypeLabel;
+        private JLabel lumberResourceTypeLabel;
+        private JLabel brickResourceTypeLabel;
+        private JLabel oreResourceTypeLabel;
+        private JLabel sheepResourceTypeLabel;
+
+        private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {}
+        };
+
+        public MonopolyPanel() {
+            wheatResourceTypeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    monopolyPanelListener.onSelectResource(ResourceType.WHEAT);
+                }
+            });
+
+            lumberResourceTypeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    monopolyPanelListener.onSelectResource(ResourceType.LUMBER);
+                }
+            });
+
+            brickResourceTypeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    monopolyPanelListener.onSelectResource(ResourceType.BRICK);
+                }
+            });
+
+            oreResourceTypeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    monopolyPanelListener.onSelectResource(ResourceType.ORE);
+                }
+            });
+
+            sheepResourceTypeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    monopolyPanelListener.onSelectResource(ResourceType.SHEEP);
+                }
+            });
+
+            MonopolyPanel.this.add(wheatResourceTypeBtn);
+            MonopolyPanel.this.add(lumberResourceTypeBtn);
+            MonopolyPanel.this.add(brickResourceTypeBtn);
+            MonopolyPanel.this.add(oreResourceTypeBtn);
+            MonopolyPanel.this.add(sheepResourceTypeBtn);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return updateStateListener;
+        }
+    }
+
+    public interface MonopolyPanelListener {
+        void onSelectResource(ResourceType resourceType);
     }
 }

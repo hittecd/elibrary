@@ -1,3 +1,5 @@
+import sun.rmi.server.InactiveGroupException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -138,5 +140,40 @@ public class PlayerManager {
         }
 
         return false;
+    }
+
+    public boolean roadBuilderPlayed() {
+        if(currentPlayer.playDevelopmentCard(DevelopmentCard.ROAD_BUILDER)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean monopolyPlayed() {
+        return currentPlayer.playDevelopmentCard(DevelopmentCard.MONOPOLY);
+    }
+
+    public void reallocateMonopolyCards(ResourceType resourceType) {
+        int totalResourceTypeCount = 0;
+        int playerResourceTypeCount;
+
+        for(Player player : playersList) {
+            if(player != currentPlayer) {
+                Map<ResourceType, Integer> resourceMap = player.getResourceCards();
+
+                playerResourceTypeCount = resourceMap.get(resourceType);
+                totalResourceTypeCount += playerResourceTypeCount;
+
+                Map<ResourceType, Integer> lostResourceCards = new HashMap();
+                lostResourceCards.put(resourceType, playerResourceTypeCount);
+                player.spendResourceCards(lostResourceCards);
+            }
+        }
+
+        Map<ResourceType, Integer> gainedResourceCards = new HashMap();
+        gainedResourceCards.put(resourceType, totalResourceTypeCount);
+
+        currentPlayer.addResourceCards(gainedResourceCards);
     }
 }

@@ -508,13 +508,19 @@ public class Game {
             MoveResult result = new MoveResult();
 
             if(gameState == GameState.PLAY_DEV_CARD) {
-                Player currentPlayer = playerManager.getCurrentPlayer();
+                if(playerManager.roadBuilderPlayed()) {
+                    Player currentPlayer = playerManager.getCurrentPlayer();
 
-                roadBuilderDevCardManager = new RoadBuilderDevCardManager();
-                updateState(GameState.PLAY_ROAD_BUILDER);
+                    roadBuilderDevCardManager = new RoadBuilderDevCardManager();
+                    updateState(GameState.PLAY_ROAD_BUILDER);
 
-                result.setMessage("Player " + currentPlayer.getPlayerId() + " successfully played a Road Builder " +
-                        "Development Card.");
+                    result.setMessage("Player " + currentPlayer.getPlayerId() + " successfully played a Road Builder " +
+                            "Development Card.");
+                }
+                else {
+                    result.setSuccess(false);
+                    result.setMessage("You do not currently have a Road Builder Development Card in your inventory.");
+                }
             }
             else {
                 result.setSuccess(false);
@@ -528,12 +534,38 @@ public class Game {
 
         }
 
-        public void onPlayMonopolyDevCard() {
+        public MoveResult onPlayMonopolyDevCard() {
+            MoveResult result = new MoveResult();
 
+            if(gameState == GameState.PLAY_DEV_CARD) {
+                if(playerManager.monopolyPlayed()) {
+                    result.setSuccess(true);
+                    result.setMessage("");
+
+                    updateState(GameState.PLAY_MONOPOLY);
+                }
+                else {
+                    result.setSuccess(false);
+                    result.setMessage("You do not currently have a Monopoly Development Card in your inventory.");
+                }
+            }
+            else {
+                result.setSuccess(false);
+                result.setMessage("You cannot play a Development Card at this time.");
+            }
+
+            return result;
         }
 
         public void onCancel() {
 
+        }
+    };
+
+    private final GameUI.MonopolyPanelListener monopolyPanelListener = new GameUI.MonopolyPanelListener() {
+        public void onSelectResource(ResourceType resourceType) {
+            playerManager.reallocateMonopolyCards(resourceType);
+            updateState(GameState.TURN_STARTED);
         }
     };
 
@@ -557,6 +589,7 @@ public class Game {
         gameUI.setDevCardPanelListener(devCardPanelListener);
         gameUI.setRobPlayerPanelListener(robPlayerPanelListener);
         gameUI.setPlayDevCardPanelListener(playDevCardPanelListener);
+        gameUI.setMonopolyPanelListener(monopolyPanelListener);
 
         updateState(GameState.SETUP_BOARD);
     }
@@ -695,17 +728,12 @@ public class Game {
 
     private class RoadBuilderDevCardManager {
         int devCardStageIndex = 0;
-        private final List<GameState> devCardStages = new ArrayList();
 
-        private RoadBuilderDevCardManager() {
-            devCardStages.add(GameState.PLAY_ROAD_BUILDER);
-            devCardStages.add(GameState.PLAY_ROAD_BUILDER);
-        }
+        private RoadBuilderDevCardManager() {}
 
         private MoveResult setupEdge(int edgeId) {
             MoveResult moveResult = new MoveResult();
 
-            GameState stage = devCardStages.get(devCardStageIndex);
             Player currentPlayer = playerManager.getCurrentPlayer();
 
             if (board.buildRoad(currentPlayer, edgeId)) {
@@ -718,7 +746,7 @@ public class Game {
                 moveResult.setMessage(MoveResult.ERROR_FAILED_TO_BUILD_MSG);
             }
 
-            if (devCardStageIndex == devCardStages.size())
+            if (devCardStageIndex == 2)
                 updateState(GameState.TURN_STARTED);
             else {
                 updateState(GameState.PLAY_ROAD_BUILDER);
