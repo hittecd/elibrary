@@ -937,7 +937,8 @@ public class GameUI extends JPanel {
 
             roadBuilderDevCardBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    playDevCardPanelListener.onPlayRoadBuilderDevCard();
+                    MoveResult result = playDevCardPanelListener.onPlayRoadBuilderDevCard();
+                    notificationPane.showMessageDialog(null, result.getMessage());
                 }
             });
 

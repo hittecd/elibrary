@@ -370,6 +370,9 @@ public class Game {
                 if(result.isSuccess())
                     updateState(GameState.TURN_STARTED);
             }
+            else if(gameState == GameState.PLAY_ROAD_BUILDER) {
+                return roadBuilderDevCardManager.setupEdge(edgeId);
+            }
             else if(gameState == GameState.SETUP_BOARD) {
                 return setupBoardManager.setupEdge(edgeId);
             }
@@ -502,7 +505,23 @@ public class Game {
         }
 
         public MoveResult onPlayRoadBuilderDevCard() {
-            return null;
+            MoveResult result = new MoveResult();
+
+            if(gameState == GameState.PLAY_DEV_CARD) {
+                Player currentPlayer = playerManager.getCurrentPlayer();
+
+                roadBuilderDevCardManager = new RoadBuilderDevCardManager();
+                updateState(GameState.PLAY_ROAD_BUILDER);
+
+                result.setMessage("Player " + currentPlayer.getPlayerId() + " successfully played a Road Builder " +
+                        "Development Card.");
+            }
+            else {
+                result.setSuccess(false);
+                result.setMessage("You cannot play a Development Card at this time.");
+            }
+
+            return result;
         }
 
         public void onPlayYearOfPlentyDevCard() {
@@ -517,6 +536,8 @@ public class Game {
 
         }
     };
+
+    private RoadBuilderDevCardManager roadBuilderDevCardManager;
 
     private GameState gameState;
     private int rollVal;
@@ -666,6 +687,41 @@ public class Game {
                 SetupStage nextStage = setupStages.get(setupStageIndex);
                 playerManager.setPlayerById(nextStage.playerId);
                 updateState(GameState.SETUP_BOARD);
+            }
+
+            return moveResult;
+        }
+    }
+
+    private class RoadBuilderDevCardManager {
+        int devCardStageIndex = 0;
+        private final List<GameState> devCardStages = new ArrayList();
+
+        private RoadBuilderDevCardManager() {
+            devCardStages.add(GameState.PLAY_ROAD_BUILDER);
+            devCardStages.add(GameState.PLAY_ROAD_BUILDER);
+        }
+
+        private MoveResult setupEdge(int edgeId) {
+            MoveResult moveResult = new MoveResult();
+
+            GameState stage = devCardStages.get(devCardStageIndex);
+            Player currentPlayer = playerManager.getCurrentPlayer();
+
+            if (board.buildRoad(currentPlayer, edgeId)) {
+                moveResult.setSuccess(true);
+                moveResult.setMessage("Player " + currentPlayer.getPlayerId() + " successfully built a road.");
+
+                devCardStageIndex++;
+            } else {
+                moveResult.setSuccess(false);
+                moveResult.setMessage(MoveResult.ERROR_FAILED_TO_BUILD_MSG);
+            }
+
+            if (devCardStageIndex == devCardStages.size())
+                updateState(GameState.TURN_STARTED);
+            else {
+                updateState(GameState.PLAY_ROAD_BUILDER);
             }
 
             return moveResult;
