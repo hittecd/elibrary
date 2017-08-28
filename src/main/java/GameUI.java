@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.util.*;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.swing.*;
 
 public class GameUI extends JPanel {
@@ -23,6 +24,7 @@ public class GameUI extends JPanel {
     private final BoardPanel boardPanel = new BoardPanel();
     private final RobPlayerPanel choosePlayerPanel = new RobPlayerPanel();
     private final PlayDevCardPanel playDevCardPanel = new PlayDevCardPanel();
+    private final YearOfPlentyPanel yearOfPlentyPanel = new YearOfPlentyPanel();
     private final MonopolyPanel monopolyPanel = new MonopolyPanel();
 
     private final JOptionPane notificationPane = new JOptionPane();
@@ -40,6 +42,9 @@ public class GameUI extends JPanel {
             }
             if(newState == GameState.PLAY_DEV_CARD) {
                 leftPane.add(playDevCardPanel);
+            }
+            if(newState == GameState.PLAY_YEAR_OF_PLENTY) {
+                leftPane.add(yearOfPlentyPanel);
             }
             if(newState == GameState.PLAY_MONOPOLY) {
                 leftPane.add(monopolyPanel);
@@ -61,6 +66,7 @@ public class GameUI extends JPanel {
     private DevCardPanelListener devCardPanelListener;
     private RobPlayerPanelListener robPlayerPanelListener;
     private PlayDevCardPanelListener playDevCardPanelListener;
+    private YearOfPlentyPanelListener yearOfPlentyPanelListener;
     private MonopolyPanelListener monopolyPanelListener;
 
     public GameUI(Game game) {
@@ -72,6 +78,7 @@ public class GameUI extends JPanel {
         game.registerUpdateStateListener(devCardPanel.getUpdateStateListener());
         game.registerUpdateStateListener(choosePlayerPanel.getUpdateStateListener());
         game.registerUpdateStateListener(playDevCardPanel.getUpdateStateListener());
+        game.registerUpdateStateListener(yearOfPlentyPanel.getUpdateStateListener());
         game.registerUpdateStateListener(monopolyPanel.getUpdateStateListener());
         game.registerUpdateStateListener(this.getUpdateStateListener());
 
@@ -113,6 +120,10 @@ public class GameUI extends JPanel {
 
     public void setPlayDevCardPanelListener(PlayDevCardPanelListener listener) {
         playDevCardPanelListener = listener;
+    }
+
+    public void setYearOfPlentyPanelListener(YearOfPlentyPanelListener listener) {
+        yearOfPlentyPanelListener = listener;
     }
 
     public void setMonopolyPanelListener(MonopolyPanelListener listener) {
@@ -987,18 +998,203 @@ public class GameUI extends JPanel {
 
         MoveResult onPlayRoadBuilderDevCard();
 
-        void onPlayYearOfPlentyDevCard();
+        MoveResult onPlayYearOfPlentyDevCard();
 
         MoveResult onPlayMonopolyDevCard();
 
         void onCancel();
     }
 
+    private class YearOfPlentyPanel extends JPanel {
+        private final JPanel wheatResourcePanel = new JPanel();
+        private final JPanel lumberResourcePanel = new JPanel();
+        private final JPanel brickResourcePanel = new JPanel();
+        private final JPanel oreResourcePanel = new JPanel();
+        private final JPanel sheepResourcePanel = new JPanel();
+
+        private final JLabel wheatResourceTypeLabel = new JLabel("Wheat");
+        private final JLabel lumberResourceTypeLabel = new JLabel("Lumber");;
+        private final JLabel brickResourceTypeLabel = new JLabel("Brick");;
+        private final JLabel oreResourceTypeLabel = new JLabel("Ore");;
+        private final JLabel sheepResourceTypeLabel = new JLabel("Sheep");;
+        private final JLabel selectedResourceLabel = new JLabel("");
+
+        private final Map<ResourceType, Integer> selectedResourcesMap = new HashMap();
+
+        private final JButton submitBtn = new JButton("Submit");
+
+        private final Game.UpdateStateListener updateStateListener = new Game.UpdateStateListener() {
+            public void updateState(GameState newState) {}
+        };
+
+        public YearOfPlentyPanel() {
+            JButton addButton;
+            JButton minusButton;
+
+            addButton = new JButton("+");
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    incrementResourceType(ResourceType.WHEAT);
+                }
+            });
+
+            minusButton = new JButton("-");
+            minusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    decrementResourceType(ResourceType.WHEAT);
+                }
+            });
+
+            wheatResourcePanel.add(wheatResourceTypeLabel);
+            wheatResourcePanel.add(minusButton);
+            wheatResourcePanel.add(addButton);
+            YearOfPlentyPanel.this.add(wheatResourcePanel);
+
+            addButton = new JButton("+");
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    incrementResourceType(ResourceType.LUMBER);
+                }
+            });
+
+            minusButton = new JButton("-");
+            minusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    decrementResourceType(ResourceType.LUMBER);
+                }
+            });
+
+            lumberResourcePanel.add(lumberResourceTypeLabel);
+            lumberResourcePanel.add(minusButton);
+            lumberResourcePanel.add(addButton);
+            YearOfPlentyPanel.this.add(lumberResourcePanel);
+
+            addButton = new JButton("+");
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    incrementResourceType(ResourceType.BRICK);
+                }
+            });
+
+            minusButton = new JButton("-");
+            minusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    decrementResourceType(ResourceType.BRICK);
+                }
+            });
+
+            brickResourcePanel.add(brickResourceTypeLabel);
+            brickResourcePanel.add(minusButton);
+            brickResourcePanel.add(addButton);
+            YearOfPlentyPanel.this.add(brickResourcePanel);
+
+            addButton = new JButton("+");
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    incrementResourceType(ResourceType.ORE);
+                }
+            });
+
+            minusButton = new JButton("-");
+            minusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    decrementResourceType(ResourceType.ORE);
+                }
+            });
+
+            oreResourcePanel.add(oreResourceTypeLabel);
+            oreResourcePanel.add(minusButton);
+            oreResourcePanel.add(addButton);
+            YearOfPlentyPanel.this.add(oreResourcePanel);
+
+            addButton = new JButton("+");
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    incrementResourceType(ResourceType.SHEEP);
+                }
+            });
+
+            minusButton = new JButton("-");
+            minusButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    decrementResourceType(ResourceType.SHEEP);
+                }
+            });
+
+            sheepResourcePanel.add(sheepResourceTypeLabel);
+            sheepResourcePanel.add(minusButton);
+            sheepResourcePanel.add(addButton);
+            YearOfPlentyPanel.this.add(sheepResourcePanel);
+
+            selectedResourcesMap.put(ResourceType.WHEAT, 0);
+            selectedResourcesMap.put(ResourceType.LUMBER, 0);
+            selectedResourcesMap.put(ResourceType.BRICK, 0);
+            selectedResourcesMap.put(ResourceType.ORE, 0);
+            selectedResourcesMap.put(ResourceType.SHEEP, 0);
+
+            YearOfPlentyPanel.this.add(selectedResourceLabel);
+
+            submitBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int totalCount = 0;
+                    for(Integer i : selectedResourcesMap.values())
+                        totalCount += i;
+
+                    if(totalCount == 2)
+                        yearOfPlentyPanelListener.onSubmit(selectedResourcesMap);
+                }
+            });
+            YearOfPlentyPanel.this.add(submitBtn);
+        }
+
+        public Game.UpdateStateListener getUpdateStateListener() {
+            return updateStateListener;
+        }
+
+        private void incrementResourceType(ResourceType resourceType) {
+            int totalSelected = 0;
+            for(Integer i : selectedResourcesMap.values()) {
+                totalSelected += i;
+            }
+
+            if(totalSelected < 2) {
+                int currentCount = selectedResourcesMap.get(resourceType);
+                selectedResourcesMap.put(resourceType, currentCount + 1);
+                updateResourceLabel();
+            }
+        }
+
+        private void decrementResourceType(ResourceType resourceType) {
+            int currentCount = selectedResourcesMap.get(resourceType);
+            if(currentCount > 0) {
+                selectedResourcesMap.put(resourceType, currentCount - 1);
+                updateResourceLabel();
+            }
+        }
+
+        private void updateResourceLabel() {
+            StringBuilder sb = new StringBuilder();
+            for(ResourceType resourceType : selectedResourcesMap.keySet()) {
+                int currentCount = selectedResourcesMap.get(resourceType);
+                if(currentCount != 0) {
+                    sb.append(resourceType + ": " + currentCount + "\n");
+                }
+            }
+
+            selectedResourceLabel.setText(sb.toString());
+            selectedResourceLabel.revalidate();
+        }
+    }
+
+    public interface YearOfPlentyPanelListener {
+        void onSubmit(Map<ResourceType, Integer> selectedResources);
+    }
+
     private class MonopolyPanel extends JPanel {
         private final JLabel playDevCardPanelTitle = new JLabel("Select a Resource Type:");
 
         private final JButton wheatResourceTypeBtn = new JButton("Wheat");
-        private final JButton lumberResourceTypeBtn= new JButton("Lumber");
+        private final JButton lumberResourceTypeBtn = new JButton("Lumber");
         private final JButton brickResourceTypeBtn = new JButton("Brick");
         private final JButton oreResourceTypeBtn = new JButton("Ore");
         private final JButton sheepResourceTypeBtn = new JButton("Sheep");

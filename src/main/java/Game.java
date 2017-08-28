@@ -530,8 +530,24 @@ public class Game {
             return result;
         }
 
-        public void onPlayYearOfPlentyDevCard() {
+        public MoveResult onPlayYearOfPlentyDevCard() {
+            MoveResult result = new MoveResult();
 
+            if(gameState == GameState.PLAY_DEV_CARD) {
+                if (playerManager.yearOfPlentyPlayed()) {
+                    updateState(GameState.PLAY_YEAR_OF_PLENTY);
+                }
+                else {
+                    result.setSuccess(false);
+                    result.setMessage("You do not currently have a Year of Plenty Development Card in your inventory.");
+                }
+            }
+            else{
+                result.setSuccess(false);
+                result.setMessage("You cannot play a Development Card at this time.");
+            }
+
+            return result;
         }
 
         public MoveResult onPlayMonopolyDevCard() {
@@ -562,6 +578,14 @@ public class Game {
         }
     };
 
+    private final GameUI.YearOfPlentyPanelListener yearOfPlentyPanelListener = new GameUI.YearOfPlentyPanelListener() {
+        public void onSubmit(Map<ResourceType, Integer> selectedResources) {
+            bank.allocateResourceCards(selectedResources);
+            playerManager.allocateYearOfPlentyCards(selectedResources);
+            updateState(GameState.TURN_STARTED);
+        }
+    };
+
     private final GameUI.MonopolyPanelListener monopolyPanelListener = new GameUI.MonopolyPanelListener() {
         public void onSelectResource(ResourceType resourceType) {
             playerManager.reallocateMonopolyCards(resourceType);
@@ -589,6 +613,7 @@ public class Game {
         gameUI.setDevCardPanelListener(devCardPanelListener);
         gameUI.setRobPlayerPanelListener(robPlayerPanelListener);
         gameUI.setPlayDevCardPanelListener(playDevCardPanelListener);
+        gameUI.setYearOfPlentyPanelListener(yearOfPlentyPanelListener);
         gameUI.setMonopolyPanelListener(monopolyPanelListener);
 
         updateState(GameState.SETUP_BOARD);

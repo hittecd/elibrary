@@ -150,6 +150,14 @@ public class PlayerManager {
         return false;
     }
 
+    public boolean yearOfPlentyPlayed() {
+        return currentPlayer.playDevelopmentCard(DevelopmentCard.YEAR_OF_PLENTY);
+    }
+
+    public void allocateYearOfPlentyCards(Map<ResourceType, Integer> resourceCardMap) {
+        currentPlayer.addResourceCards(resourceCardMap);
+    }
+
     public boolean monopolyPlayed() {
         return currentPlayer.playDevelopmentCard(DevelopmentCard.MONOPOLY);
     }
